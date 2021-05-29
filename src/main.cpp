@@ -8,10 +8,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 
+#include "Chunk.h"
+
 int main(void)
 {
     sf::Window window;
-   // window.setFramerateLimit(60);
+    // window.setFramerateLimit(60);
     window.setMouseCursorGrabbed(true);
     if (!initWindow(&window)) {
         return 1;
@@ -45,6 +47,13 @@ int main(void)
     camera.transform.position.x = 50;
     camera.transform.position.y = 50;
     camera.transform.position.z = 50;
+
+    Chunk chunk;
+    chunk.voxels.fill(1);
+
+    VertexArray chunkRender;
+    auto mesh = createChunkMesh(chunk);
+    chunkRender.bufferMesh(mesh);
 
     // Scene objects
     Transform modelTransform;
@@ -90,12 +99,12 @@ int main(void)
         // Render the quad
         quad.bind();
         texture.bind();
-        modelTransform.position += glm::sin(sinTimer.getElapsedTime().asSeconds()) / 128;
-        modelTransform.rotation += 1.0f;
         glm::mat4 modelMatrix = createModelMatrix(modelTransform);
         shader.loadUniform("modelMatrix", modelMatrix);
-
         glDrawElements(GL_TRIANGLES, quad.indicesCount(), GL_UNSIGNED_INT, 0);
+
+        chunkRender.bind();
+        glDrawElements(GL_TRIANGLES, chunkRender.indicesCount(), GL_UNSIGNED_INT, 0);
 
         // 2. Unbind framebuffers, render to the window
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

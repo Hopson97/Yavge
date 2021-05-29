@@ -146,9 +146,8 @@ bool initWindow(sf::Window* window)
     contextSettings.majorVersion = 4;
     contextSettings.minorVersion = 5;
     contextSettings.attributeFlags = sf::ContextSettings::Core;
-    window->create({1600, 900}, "yare", sf::Style::Fullscreen, contextSettings);
-
-
+    window->create({1600, 900}, "yare", sf::Style::Close, contextSettings);
+    window->setPosition({window->getPosition().x, 0});
 
     if (!gladLoadGL()) {
         printf("Error: Could not load OpenGL.");
