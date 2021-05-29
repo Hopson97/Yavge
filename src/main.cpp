@@ -11,7 +11,7 @@
 int main(void)
 {
     sf::Window window;
-    window.setFramerateLimit(60);
+   // window.setFramerateLimit(60);
     window.setMouseCursorGrabbed(true);
     if (!initWindow(&window)) {
         return 1;

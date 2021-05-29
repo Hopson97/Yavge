@@ -1,8 +1,8 @@
-# Nuklear SFML OpenGL Example
+# YAVGE 
 
-Example of using SFML with Nuklear + OpenGL.
+Yet Another Voxel Graphics Engine
 
-https://github.com/Immediate-Mode-UI/Nuklear
+Playing around with more advanced graphics stuff in a voxel mesh engine.
 
 ## Building and Running
 

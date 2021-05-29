@@ -20,7 +20,7 @@ target_debug() {
 # Create folder for distribution
 if [ "$1" = "release" ]
 then
-    if [ -d "$yavge " ]
+    if [ -d "$yavge" ]
     then
         rm -rf -d yavge 
     fi
@@ -43,7 +43,7 @@ conan install .. -s compiler.libcxx=libstdc++11 --build=missing
 if [ "$1" = "release" ]
 then
     target_release
-    cp build/release/yavge  yavge/yavge 
+    cp build/release/bin/yavge  yavge/yavge 
 else
     target_debug
 fi
