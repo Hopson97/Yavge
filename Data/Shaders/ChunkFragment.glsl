@@ -1,10 +1,10 @@
 #version 450 core
 
-in vec2 passTextureCoord;
+in vec3 passTextureCoord;
 
 out vec4 outColour;
 
-uniform sampler2D tex;
+uniform sampler2DArray tex;
 
 void main()
 {

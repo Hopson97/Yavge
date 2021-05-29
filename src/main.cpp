@@ -1,7 +1,8 @@
 #include "Camera.h"
 #include "GUI.h"
+#include <iostream>
 #include "Graphics/GLWrappers.h"
-#include "Graphics/Mesh.h"
+#include "Mesh.h"
 #include "Maths.h"
 #include "Utility.h"
 #include <SFML/GpuPreference.hpp>
@@ -33,10 +34,15 @@ int main(void)
     VertexArray screen;
 
     Shader shader("MinVertex.glsl", "MinFragment.glsl");
+    Shader chunkShader("ChunkVertex.glsl", "ChunkFragment.glsl");
     Shader frameBufferShader("FramebufferVertex.glsl", "FramebufferFragment.glsl");
 
     Texture2d texture;
-    texture.loadTexture("opengl_logo.png");
+    TextureArray texArray;
+    texArray.create(32, 16);
+    std::cout << texArray.addTexture("grass.png") << std::endl;
+
+    texture.loadTexture("grass.png");
 
     Framebuffer framebuffer(WIDTH, HEIGHT);
     auto colour = framebuffer.addTexture();
@@ -49,7 +55,15 @@ int main(void)
     camera.transform.position.z = 50;
 
     Chunk chunk;
-    chunk.voxels.fill(1);
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            int h = x ;//^ z;
+            for (int y = 0; y < h; y++) {
+                chunk.setVoxel({x, y, z}, 1);
+            }
+        }
+    }
 
     VertexArray chunkRender;
     auto mesh = createChunkMesh(chunk);
@@ -103,6 +117,10 @@ int main(void)
         shader.loadUniform("modelMatrix", modelMatrix);
         glDrawElements(GL_TRIANGLES, quad.indicesCount(), GL_UNSIGNED_INT, 0);
 
+        // Use the scene shaders
+        chunkShader.bind();
+        texArray.bind();
+        chunkShader.loadUniform("projectionViewMatrix", projectionViewMatrix);
         chunkRender.bind();
         glDrawElements(GL_TRIANGLES, chunkRender.indicesCount(), GL_UNSIGNED_INT, 0);
 

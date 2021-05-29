@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mesh.h"
+#include "../Mesh.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
@@ -15,12 +15,14 @@ class VertexArray final {
     VertexArray();
 
     void bufferMesh(const Mesh& mesh);
+    void bufferMesh(const ChunkMesh& mesh);
     void bind() const;
 
     GLsizei indicesCount();
 
   private:
     void bufferVertexData(const std::vector<Vertex>& verts);
+    void bufferVertexData(const std::vector<ChunkVertex>& verts);
     void bufferIndicesData(const std::vector<GLuint> indices);
 
     GLuint m_vao = 0;

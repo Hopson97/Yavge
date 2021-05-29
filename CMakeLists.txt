@@ -17,7 +17,7 @@ add_executable(${PROJECT_NAME}
     src/GUI.cpp
     src/Maths.cpp
     src/Utility.cpp
-    src/Graphics/Mesh.cpp
+    src/Mesh.cpp
     src/Graphics/Framebuffer.cpp
     src/Graphics/Shader.cpp
     src/Graphics/Texture.cpp
