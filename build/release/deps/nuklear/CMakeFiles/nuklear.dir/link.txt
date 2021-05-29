@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libnuklear.a  CMakeFiles/nuklear.dir/nuklear_sfml_gl3.cpp.o CMakeFiles/nuklear.dir/demos.cpp.o CMakeFiles/nuklear.dir/nuklear_impl.c.o
-/usr/bin/ranlib ../../lib/libnuklear.a
