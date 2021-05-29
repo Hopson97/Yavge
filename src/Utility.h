@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SFML/Window/Event.hpp>
 #include <SFML/Window/Window.hpp>
 
 // Default window height and width
@@ -18,6 +19,32 @@ struct Colour {
 enum ColourSetMode {
     COL_SET_BG = 48,
     COL_SET_FG = 38,
+};
+
+class Keyboard {
+  public:
+    Keyboard()
+    {
+        std::fill(m_keys.begin(), m_keys.end(), false);
+    }
+
+    bool isKeyDown(sf::Keyboard::Key key) const
+    {
+        return m_keys[key];
+    }
+
+    void update(sf::Event e)
+    {
+        if (e.type == sf::Event::KeyPressed) {
+            m_keys[e.key.code] = true;
+        }
+        else if (e.type == sf::Event::KeyReleased) {
+            m_keys[e.key.code] = false;
+        }
+    }
+
+  private:
+    std::array<bool, sf::Keyboard::KeyCount> m_keys{false};
 };
 
 void setTerminalBackgroundColour(Colour colour);

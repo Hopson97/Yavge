@@ -1,4 +1,4 @@
 #!/bin/bash
 
 sh scripts/build.sh
-gdb ./bin/debug/yavge 
+gdb ./build/debug/bin/basic3 

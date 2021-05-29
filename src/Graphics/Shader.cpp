@@ -121,27 +121,27 @@ GLuint Shader::getUniformLocation(const char* name)
     return m_uniformLocations[name];
 }
 
-void Shader::loadUniform(const char* name, int value)
+void Shader::set(const char* name, int value)
 {
     glUniform1i(getUniformLocation(name), value);
 }
 
-void Shader::loadUniform(const char* name, float value)
+void Shader::set(const char* name, float value)
 {
     glUniform1f(getUniformLocation(name), value);
 }
 
-void Shader::loadUniform(const char* name, const glm::mat4& matrix)
+void Shader::set(const char* name, const glm::mat4& matrix)
 {
     glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::loadUniform(const char* name, const glm::vec4& vector)
+void Shader::set(const char* name, const glm::vec4& vector)
 {
     glUniform4fv(getUniformLocation(name), 1, glm::value_ptr(vector));
 }
 
-void Shader::loadUniform(const char* name, const glm::vec3& vector)
+void Shader::set(const char* name, const glm::vec3& vector)
 {
     glUniform3fv(getUniformLocation(name), 1, glm::value_ptr(vector));
 }

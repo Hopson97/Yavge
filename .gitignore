@@ -1,6 +1,6 @@
 # Linux
 /bin
-yavge
+basic3
 
 # Windows
 *.dll
@@ -20,7 +20,3 @@ Release/
 *.srctrlprj
 *.srctrldb
 *.srctrlbm
-
-imgui.ini
-
-build/

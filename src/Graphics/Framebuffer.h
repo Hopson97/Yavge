@@ -19,6 +19,8 @@ class Framebuffer final {
 
     void bind() const;
 
+    static void unbind();
+
   private:
     std::vector<Texture2d> m_attachments;
     GLuint m_width = 0;

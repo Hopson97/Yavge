@@ -100,7 +100,9 @@ char* getFileContent(const char* fileName)
         fseek(file, 0, SEEK_SET);
         buffer = (char*)calloc(length + 1, 1);
         if (buffer) {
-            fread(buffer, 1, length, file);
+            if (!fread(buffer, 1, length, file)) {
+                free(buffer);
+            }
         }
         fclose(file);
     }
@@ -147,7 +149,7 @@ bool initWindow(sf::Window* window)
     contextSettings.minorVersion = 5;
     contextSettings.attributeFlags = sf::ContextSettings::Core;
     window->create({1600, 900}, "yare", sf::Style::Close, contextSettings);
-    window->setPosition({window->getPosition().x, 0});
+    window->setPosition({(int)sf::VideoMode::getDesktopMode().width / 2 - (int)window->getSize().x / 2, 0});
 
     if (!gladLoadGL()) {
         printf("Error: Could not load OpenGL.");

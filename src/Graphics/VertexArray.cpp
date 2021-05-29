@@ -1,6 +1,5 @@
 #include "VertexArray.h"
 #include <glm/glm.hpp>
-#include <stb/stb_perlin.h>
 
 VertexArray::VertexArray()
 {
@@ -56,31 +55,15 @@ void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
     // glEnableVertexAttribArray
     glEnableVertexArrayAttrib(m_vao, 0);
     glEnableVertexArrayAttrib(m_vao, 1);
+    glEnableVertexArrayAttrib(m_vao, 2);
 
     // glVertexAttribPointer
     glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
-    glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, texture));
+    glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, textureCoord));
+    glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
     glVertexArrayAttribBinding(m_vao, 0, 0);
     glVertexArrayAttribBinding(m_vao, 1, 0);
-}
-
-void VertexArray::bufferVertexData(const std::vector<ChunkVertex>& verts)
-{
-    // glBufferData
-    glNamedBufferStorage(m_vbo, sizeof(ChunkVertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
-
-    // Attach the vertex array to the vertex buffer and element buffer
-    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(ChunkVertex));
-
-    // glEnableVertexAttribArray
-    glEnableVertexArrayAttrib(m_vao, 0);
-    glEnableVertexArrayAttrib(m_vao, 1);
-
-    // glVertexAttribPointer
-    glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(ChunkVertex, position));
-    glVertexArrayAttribFormat(m_vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(ChunkVertex, texture));
-    glVertexArrayAttribBinding(m_vao, 0, 0);
-    glVertexArrayAttribBinding(m_vao, 1, 0);
+    glVertexArrayAttribBinding(m_vao, 2, 0);
 }
 
 void VertexArray::bufferIndicesData(const std::vector<GLuint> indices)
@@ -91,12 +74,6 @@ void VertexArray::bufferIndicesData(const std::vector<GLuint> indices)
 }
 
 void VertexArray::bufferMesh(const Mesh& mesh)
-{
-    bufferVertexData(mesh.vertices);
-    bufferIndicesData(mesh.indices);
-}
-
-void VertexArray::bufferMesh(const ChunkMesh& mesh)
 {
     bufferVertexData(mesh.vertices);
     bufferIndicesData(mesh.indices);

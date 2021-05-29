@@ -3,7 +3,7 @@
 #include <nuklear/nuklear_def.h>
 #include <nuklear/nuklear_sfml_gl3.h>
 
-#include "Camera.h"
+#include "Maths.h"
 
 #define MAX_VERTEX_MEMORY 0x80000
 #define MAX_ELEMENT_MEMORY 0x80000
@@ -51,7 +51,7 @@ void guiProcessEvent(sf::Event& event)
     nk_sfml_handle_event(&event);
 }
 
-void guiDebugScreen(const Camera& camera)
+void guiDebugScreen(const Transform& transform)
 {
     /* window flags */
     int window_flags = 0;
@@ -64,12 +64,12 @@ void guiDebugScreen(const Camera& camera)
 
     if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 400, 200), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Player Position: (%f %f %f)", camera.transform.position[0],
-                  camera.transform.position[1], camera.transform.position[2]);
+        nk_labelf(ctx, NK_STATIC, "Player Position: (%f %f %f)", transform.position[0], transform.position[1],
+                  transform.position[2]);
 
         nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Player Rotation: (%f %f %f)", camera.transform.rotation[0],
-                  camera.transform.rotation[1], camera.transform.rotation[2]);
+        nk_labelf(ctx, NK_STATIC, "Player Rotation: (%f %f %f)", transform.rotation[0], transform.rotation[1],
+                  transform.rotation[2]);
 
         nk_layout_row_dynamic(ctx, 25, 1);
 

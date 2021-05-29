@@ -1,22 +1,22 @@
-# YAVGE 
+# basic3
 
-Yet Another Voxel Graphics Engine
-
-Playing around with more advanced graphics stuff in a voxel mesh engine.
+description here
 
 ## Building and Running
 
 ### Libraries
 
-SDL2 is required.
+SFML is required.
 
 These can be installed from your project manager. For example, on Debian/ Ubuntu:
 
 ```sh
-sudo apt install libsdl2-dev
+sudo apt install libsfml-dev
 ```
 
-If this is not possible (eg windows), you can install these manually from their respective website.
+If this is not possible (eg windows), you can install these manually from their respective websites:
+
+https://www.sfml-dev.org/download.php
 
 ### Linux
 

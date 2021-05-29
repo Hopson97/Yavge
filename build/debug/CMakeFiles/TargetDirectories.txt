@@ -1,0 +1,11 @@
+/home/hopson/Documents/programming/cpp/basic3/build/debug/CMakeFiles/rebuild_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/CMakeFiles/edit_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/CMakeFiles/basic3.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/CMakeFiles/rebuild_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/CMakeFiles/edit_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/glad/CMakeFiles/rebuild_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/glad/CMakeFiles/edit_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/glad/CMakeFiles/glad.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/nuklear/CMakeFiles/edit_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/nuklear/CMakeFiles/rebuild_cache.dir
+/home/hopson/Documents/programming/cpp/basic3/build/debug/deps/nuklear/CMakeFiles/nuklear.dir

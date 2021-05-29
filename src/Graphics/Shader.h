@@ -10,11 +10,11 @@ class Shader final {
 
     void loadFromFile(const char* vertexFilename, const char* fragmentFileName);
 
-    void loadUniform(const char* name, int value);
-    void loadUniform(const char* name, float value);
-    void loadUniform(const char* name, const glm::mat4& matrix);
-    void loadUniform(const char* name, const glm::vec4& vector);
-    void loadUniform(const char* name, const glm::vec3& vector);
+    void set(const char* name, int value);
+    void set(const char* name, float value);
+    void set(const char* name, const glm::mat4& matrix);
+    void set(const char* name, const glm::vec4& vector);
+    void set(const char* name, const glm::vec3& vector);
 
     void bind() const;
 

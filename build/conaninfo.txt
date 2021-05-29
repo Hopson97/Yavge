@@ -1,0 +1,149 @@
+[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=gcc
+    compiler.libcxx=libstdc++11
+    compiler.version=9
+    os=Linux
+
+[requires]
+    assimp/5.Y.Z
+    glm/0.9.9.8
+    sfml/2.Y.Z
+
+[options]
+
+
+[full_settings]
+    arch=x86_64
+    arch_build=x86_64
+    build_type=Release
+    compiler=gcc
+    compiler.libcxx=libstdc++11
+    compiler.version=9
+    os=Linux
+    os_build=Linux
+
+[full_requires]
+    assimp/5.0.1:805d61ab0598e76b12d97807251e7e2783426b45
+    bzip2/1.0.8:da606cf731e334010b0bf6e85a2a6f891b9f36b0
+    flac/1.3.3:b9bd28193f63cd74fd2213b63c74017e7893c24d
+    freetype/2.10.1:387eb5152986b9b3cbc2ebb94607d96d90674d67
+    glm/0.9.9.8:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    irrxml/1.2:b911f48570f9bb2902d9e83b2b9ebf9d376c8c56
+    libalsa/1.2.4:d48130e0dd76369b1338deb3b2372c5a649f9f2d
+    libpng/1.6.37:f99afdbf2a1cc98ba2029817b35103455b6a9b77
+    ogg/1.3.4:6af9cc7cb931c5ad942174fd7838eb655717c709
+    openal/1.19.1:8f758c7d79f11e0791dfc187e19cd92dffabbd2b
+    opengl/system:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    sfml/2.5.1@bincrafters/stable:0001157c962c3889b834759df18c803aa6d4312e
+    stb/20200203:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    vorbis/1.3.6:033a9a186751ed382a6fa5fa2c844ad34b7c3302
+    xorg/system:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    zlib/1.2.11:6af9cc7cb931c5ad942174fd7838eb655717c709
+
+[full_options]
+    assimp:double_precision=False
+    assimp:fPIC=True
+    assimp:shared=False
+    assimp:with_3d=True
+    assimp:with_3ds=True
+    assimp:with_3ds_exporter=True
+    assimp:with_3mf=True
+    assimp:with_3mf_exporter=True
+    assimp:with_ac=True
+    assimp:with_amf=True
+    assimp:with_ase=True
+    assimp:with_assbin=True
+    assimp:with_assbin_exporter=True
+    assimp:with_assjson_exporter=True
+    assimp:with_assxml_exporter=True
+    assimp:with_b3d=True
+    assimp:with_blend=True
+    assimp:with_bvh=True
+    assimp:with_cob=True
+    assimp:with_collada=True
+    assimp:with_collada_exporter=True
+    assimp:with_csm=True
+    assimp:with_dxf=True
+    assimp:with_fbx=True
+    assimp:with_fbx_exporter=True
+    assimp:with_gltf=True
+    assimp:with_gltf_exporter=True
+    assimp:with_hmp=True
+    assimp:with_ifc=True
+    assimp:with_irr=True
+    assimp:with_irrmesh=True
+    assimp:with_lwo=True
+    assimp:with_lws=True
+    assimp:with_md2=True
+    assimp:with_md3=True
+    assimp:with_md5=True
+    assimp:with_mdc=True
+    assimp:with_mdl=True
+    assimp:with_mmd=True
+    assimp:with_ms3d=True
+    assimp:with_ndo=True
+    assimp:with_nff=True
+    assimp:with_obj=True
+    assimp:with_obj_exporter=True
+    assimp:with_off=True
+    assimp:with_ogre=True
+    assimp:with_opengex=True
+    assimp:with_opengex_exporter=True
+    assimp:with_ply=True
+    assimp:with_ply_exporter=True
+    assimp:with_q3bsp=True
+    assimp:with_q3d=True
+    assimp:with_raw=True
+    assimp:with_sib=True
+    assimp:with_smd=True
+    assimp:with_step=True
+    assimp:with_step_exporter=True
+    assimp:with_stl=True
+    assimp:with_stl_exporter=True
+    assimp:with_terragen=True
+    assimp:with_x=True
+    assimp:with_x3d=True
+    assimp:with_x3d_exporter=True
+    assimp:with_x_exporter=True
+    assimp:with_xgl=True
+    bzip2:build_executable=True
+    bzip2:fPIC=True
+    bzip2:shared=False
+    flac:fPIC=True
+    flac:shared=False
+    freetype:fPIC=True
+    freetype:shared=False
+    freetype:with_bzip2=True
+    freetype:with_png=True
+    freetype:with_zlib=True
+    irrxml:fPIC=True
+    irrxml:shared=False
+    libalsa:disable_python=True
+    libalsa:fPIC=True
+    libalsa:shared=False
+    libpng:api_prefix=None
+    libpng:fPIC=True
+    libpng:shared=False
+    ogg:fPIC=True
+    ogg:shared=False
+    openal:fPIC=True
+    openal:shared=False
+    sfml:audio=True
+    sfml:fPIC=True
+    sfml:graphics=True
+    sfml:network=True
+    sfml:shared=False
+    sfml:window=True
+    vorbis:fPIC=True
+    vorbis:shared=False
+    zlib:fPIC=True
+    zlib:minizip=deprecated
+    zlib:shared=False
+
+[recipe_hash]
+
+
+[env]
+

@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hopson/Documents/programming/cpp/basic3/deps/glad/glad.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+glad.h
+/home/hopson/Documents/programming/cpp/basic3/deps/glad/glad.h
+windows.h
+-
+winapifamily.h
+-
+dlfcn.h
+-
+
+/home/hopson/Documents/programming/cpp/basic3/deps/glad/glad.h
+khrplatform.h
+/home/hopson/Documents/programming/cpp/basic3/deps/glad/khrplatform.h
+
+/home/hopson/Documents/programming/cpp/basic3/deps/glad/khrplatform.h
+stdint.h
+-
+inttypes.h
+-
+stdint.h
+-
+
