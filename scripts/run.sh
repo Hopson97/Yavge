@@ -2,7 +2,7 @@
 
 if [ "$1" = "release" ]
 then
-    ./build/release/bin/basic3 
+    ./build/release/bin/yavge 
 else
-    ./build/debug/bin/basic3 
+    ./build/debug/bin/yavge 
 fi

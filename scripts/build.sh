@@ -19,17 +19,17 @@ target_debug() {
 # Create folder for distribution
 if [ "$1" = "release" ]
 then
-    if [ -d "$basic3 " ]
+    if [ -d "$yavge " ]
     then
-        rm -rf -d basic3 
+        rm -rf -d yavge 
     fi
 
-    mkdir -p basic3 
+    mkdir -p yavge 
 fi
 
 # Creates the folder for the buildaries
-mkdir -p basic3
-mkdir -p basic3/Data
+mkdir -p yavge
+mkdir -p yavge/Data
 mkdir -p build
 mkdir -p build/release
 mkdir -p build/debug
@@ -41,9 +41,9 @@ conan install .. -s compiler.libcxx=libstdc++11 --build=missing
 if [ "$1" = "release" ]
 then
     target_release
-    cp build/release/bin/basic3  basic3/basic3 
+    cp build/release/bin/yavge  yavge/yavge 
 else
     target_debug
 fi
 
-cp -R Data basic3/Data
+cp -R Data yavge/Data

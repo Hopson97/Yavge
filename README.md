@@ -1,6 +1,6 @@
-# basic3
+# yavge
 
-description here
+Yet Another Voxel Game Engine, or Yet Another Voxel Graphics Engine. The choice is yours.
 
 ## Building and Running
 

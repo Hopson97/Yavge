@@ -9,11 +9,12 @@ Transform camera{
     {0, -90, 0},
 };
 
-glm::vec3 lightPosition{10, 4, 10};
+glm::vec3 lightPosition{66, 33, 66};
 
 void mouseInput(const sf::Window& window)
 {
-    if (!mouseActive) return;
+    if (!mouseActive)
+        return;
     // Input stuff
     static auto lastMousePosition = sf::Mouse::getPosition(window);
     auto change = sf::Mouse::getPosition(window) - lastMousePosition;
@@ -29,7 +30,7 @@ void mouseInput(const sf::Window& window)
 
 void keyboardInput(const Keyboard& keyboard)
 {
-    const float PLAYER_SPEED = 0.05f;
+    const float PLAYER_SPEED = 0.25f;
     if (keyboard.isKeyDown(sf::Keyboard::W)) {
         camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
     }
@@ -52,6 +53,7 @@ int main()
         return 1;
     }
     guiInit(window);
+     glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
 
     Shader sceneShader("SceneVertex.glsl", "SceneFragment.glsl");
     Shader screenShader("ScreenVertex.glsl", "ScreenFragment.glsl");
@@ -64,10 +66,10 @@ int main()
     terrain.bufferMesh(createTerrainMesh());
 
     VertexArray lightCube;
-    lightCube.bufferMesh(createCubeMesh({0.5f, 0.5f, 0.5f}));
+    lightCube.bufferMesh(createCubeMesh({2.5f, 2.5f, 2.5f}));
 
     Texture2d texture;
-    texture.loadTexture("opengl_logo.png");
+    texture.loadTexture("grass.jpg");
 
     Framebuffer framebuffer(WIDTH, HEIGHT);
     const Texture2d* colour = framebuffer.addTexture();
@@ -97,9 +99,8 @@ int main()
             }
         }
 
-        lightPosition.x += sin(clock.getElapsedTime().asSeconds()) / 32;
-        lightPosition.z += cos(clock.getElapsedTime().asSeconds()) / 32;
-        lightPosition.y += cos(clock.getElapsedTime().asSeconds()) / 128;
+        lightPosition.x += sin(clock.getElapsedTime().asSeconds()) / 16;
+        lightPosition.z += cos(clock.getElapsedTime().asSeconds()) / 16;
 
         //  I n p u t
         keyboardInput(keyboard);
@@ -114,7 +115,7 @@ int main()
         framebuffer.bind();
         sceneShader.bind();
         sceneShader.set("projectionViewMatrix", projectionViewMatrix);
-        sceneShader.set("lightColour", glm::vec3{1, 0.8, 1});
+        sceneShader.set("lightColour", glm::vec3{1, 1, 1});
         sceneShader.set("lightPosition", lightPosition);
         sceneShader.set("viewerPosition", camera.position);
         sceneShader.set("isLightSource", false);

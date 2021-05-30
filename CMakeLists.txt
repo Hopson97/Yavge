@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 #Set up project
 project(
-    basic3 
+    yavge 
     VERSION 1.0
 )
 
