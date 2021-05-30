@@ -46,7 +46,7 @@ Framebuffer::~Framebuffer()
     glDeleteRenderbuffers(1, &m_rbo);
 }
 
-const Texture2d* Framebuffer::addTexture()
+const Texture2D* Framebuffer::addTexture()
 {
     auto& t = m_attachments.emplace_back();
     t.createFramebufferTexture(WIDTH, HEIGHT);

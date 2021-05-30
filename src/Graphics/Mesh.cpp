@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
-#include <iostream>
 #include <glm/gtc/noise.hpp>
+#include <iostream>
 
 Mesh createQuadMesh()
 {
@@ -26,25 +26,39 @@ Mesh createCubeMesh(const glm::vec3& dimensions)
     float h = dimensions.y;
     float d = dimensions.z;
 
+    // clang-format off
     mesh.vertices = {
-        {{w, h, d}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  {{0, h, d}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{0, 0, d}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  {{w, 0, d}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+        {{w, h, d}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{0, h, d}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0, 0, d}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{w, 0, d}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
 
-        {{0, h, d}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, {{0, h, 0}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-        {{0, 0, 0}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, {{0, 0, d}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
+        {{0, h, d}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, h, 0}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+        {{0, 0, 0}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
 
-        {{0, h, 0}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, {{w, h, 0}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-        {{w, 0, 0}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, {{0, 0, 0}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
+        {{0, h, 0}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{w, h, 0}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+        {{w, 0, 0}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{0, 0, 0}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
 
-        {{w, h, 0}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  {{w, h, d}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},  {{w, 0, 0}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+        {{w, h, 0}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, h, d}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, 0, 0}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
 
-        {{w, h, 0}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},  {{0, h, 0}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0, h, d}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},  {{w, h, d}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+        {{w, h, 0}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{0, h, 0}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0, h, d}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{w, h, d}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
 
-        {{0, 0, 0}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, {{w, 0, 0}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, {{0, 0, d}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+        {{0, 0, 0}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{w, 0, 0}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
     };
+    // clang-format on
 
     int currIndex = 0;
     for (int i = 0; i < 6; i++) {
@@ -96,7 +110,7 @@ constexpr GLfloat fEDGE_VERTEX_COUNT = GLfloat(EDGE_VERTEX_COUNT - 1);
 
 Mesh createTerrainMesh()
 {
-        NoiseOptions terrainNoise;
+    NoiseOptions terrainNoise;
     terrainNoise.roughness = 0.7;
     terrainNoise.smoothness = 350.0f;
     terrainNoise.octaves = 5;
@@ -113,11 +127,11 @@ Mesh createTerrainMesh()
     std::vector<float> heights(HEIGHT_MAP_WIDTH * HEIGHT_MAP_WIDTH);
     for (int z = 0; z < HEIGHT_MAP_WIDTH; z++) {
         for (int x = 0; x < HEIGHT_MAP_WIDTH; x++) {
-                int tx = x + (HEIGHT_MAP_WIDTH - 1);
-                int tz = z + (HEIGHT_MAP_WIDTH - 1);
-                float height = getNoiseAt({tx, tz}, 123, terrainNoise);
-                float bumps = getNoiseAt({tx, tz}, 123, bumpNoise);
-                heights[z * HEIGHT_MAP_WIDTH + x] = height + bumps;
+            int tx = x + (HEIGHT_MAP_WIDTH - 1);
+            int tz = z + (HEIGHT_MAP_WIDTH - 1);
+            float height = getNoiseAt({tx, tz}, 123, terrainNoise);
+            float bumps = getNoiseAt({tx, tz}, 123, bumpNoise);
+            heights[z * HEIGHT_MAP_WIDTH + x] = height + bumps;
         }
     }
 
@@ -129,7 +143,7 @@ Mesh createTerrainMesh()
             return heights[y * HEIGHT_MAP_WIDTH + x];
         }
     };
-    
+
     Mesh mesh;
     for (int z = 0; z < EDGE_VERTEX_COUNT; z++) {
         for (int x = 0; x < EDGE_VERTEX_COUNT; x++) {
@@ -147,8 +161,6 @@ Mesh createTerrainMesh()
 
             vertex.textureCoord.s = fx / fEDGE_VERTEX_COUNT;
             vertex.textureCoord.t = fz / fEDGE_VERTEX_COUNT;
-
-
 
             float h1 = getHeight(hx - 1, hz);
             float h2 = getHeight(hx + 1, hz);
@@ -175,5 +187,61 @@ Mesh createTerrainMesh()
             mesh.indices.push_back(bottomRight);
         }
     }
+    return mesh;
+}
+
+VoxelMesh createGrassCubeMesh()
+{
+    VoxelMesh mesh;
+
+    float w = 1;
+    float h = 1;
+    float d = 1;
+
+    // clang-format off
+    mesh.vertices = {
+        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{0, h, d}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{w, 0, d}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+
+        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, h, 0}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+
+        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{w, h, 0}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{0, 0, 0}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+
+        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, h, d}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, 0, 0}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+
+        {{w, h, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{0, h, 0}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0, h, d}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{w, h, d}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+
+        {{0, 0, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{w, 0, 0}, {0.0f, 0.0f, 2.0f}, {0.0f, -1.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f, 2.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f, 2.0f}, {0.0f, -1.0f, 0.0f}},
+    };
+    // clang-format on
+
+    int currIndex = 0;
+    for (int i = 0; i < 6; i++) {
+        mesh.indices.push_back(currIndex);
+        mesh.indices.push_back(currIndex + 1);
+        mesh.indices.push_back(currIndex + 2);
+        mesh.indices.push_back(currIndex + 2);
+        mesh.indices.push_back(currIndex + 3);
+        mesh.indices.push_back(currIndex);
+        currIndex += 4;
+    }
+
     return mesh;
 }

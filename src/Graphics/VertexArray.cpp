@@ -66,6 +66,28 @@ void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
     glVertexArrayAttribBinding(m_vao, 2, 0);
 }
 
+void VertexArray::bufferVertexData(const std::vector<VoxelVertex>& verts)
+{
+    // glBufferData
+    glNamedBufferStorage(m_vbo, sizeof(Vertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
+
+    // Attach the vertex array to the vertex buffer and element buffer
+    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(Vertex));
+
+    // glEnableVertexAttribArray
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glEnableVertexArrayAttrib(m_vao, 1);
+    glEnableVertexArrayAttrib(m_vao, 2);
+
+    // glVertexAttribPointer
+    glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, position));
+    glVertexArrayAttribFormat(m_vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, textureCoord));
+    glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, normal));
+    glVertexArrayAttribBinding(m_vao, 0, 0);
+    glVertexArrayAttribBinding(m_vao, 1, 0);
+    glVertexArrayAttribBinding(m_vao, 2, 0);
+}
+
 void VertexArray::bufferIndicesData(const std::vector<GLuint> indices)
 {
     glNamedBufferStorage(m_ibo, sizeof(GLuint) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
@@ -74,6 +96,12 @@ void VertexArray::bufferIndicesData(const std::vector<GLuint> indices)
 }
 
 void VertexArray::bufferMesh(const Mesh& mesh)
+{
+    bufferVertexData(mesh.vertices);
+    bufferIndicesData(mesh.indices);
+}
+
+void VertexArray::bufferMesh(const VoxelMesh& mesh)
 {
     bufferVertexData(mesh.vertices);
     bufferIndicesData(mesh.indices);

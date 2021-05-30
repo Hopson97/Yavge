@@ -14,7 +14,7 @@ class Framebuffer final {
     Framebuffer& operator=(Framebuffer& other) = delete;
     Framebuffer(Framebuffer& other) = delete;
 
-    const Texture2d* addTexture();
+    const Texture2D* addTexture();
     void finish();
 
     void bind() const;
@@ -22,7 +22,7 @@ class Framebuffer final {
     static void unbind();
 
   private:
-    std::vector<Texture2d> m_attachments;
+    std::vector<Texture2D> m_attachments;
     GLuint m_width = 0;
     GLuint m_height = 0;
     GLuint m_rbo = 0;

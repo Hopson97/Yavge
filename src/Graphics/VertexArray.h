@@ -15,12 +15,14 @@ class VertexArray final {
     VertexArray();
 
     void bufferMesh(const Mesh& mesh);
+    void bufferMesh(const VoxelMesh& mesh);
     void bind() const;
 
     GLsizei indicesCount();
 
   private:
     void bufferVertexData(const std::vector<Vertex>& verts);
+    void bufferVertexData(const std::vector<VoxelVertex>& verts);
     void bufferIndicesData(const std::vector<GLuint> indices);
 
     GLuint m_vao = 0;

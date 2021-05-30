@@ -30,7 +30,7 @@ void mouseInput(const sf::Window& window)
 
 void keyboardInput(const Keyboard& keyboard)
 {
-    const float PLAYER_SPEED = 0.25f;
+    const float PLAYER_SPEED = 1.0f;
     if (keyboard.isKeyDown(sf::Keyboard::W)) {
         camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
     }
@@ -52,11 +52,13 @@ int main()
     if (!initWindow(&window)) {
         return 1;
     }
+    window.setFramerateLimit(60);
     guiInit(window);
-     glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
+    glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
 
     Shader sceneShader("SceneVertex.glsl", "SceneFragment.glsl");
     Shader screenShader("ScreenVertex.glsl", "ScreenFragment.glsl");
+    Shader voxelShader("VoxelVertex.glsl", "VoxelFragment.glsl");
 
     VertexArray screen;
     VertexArray quad;
@@ -68,11 +70,22 @@ int main()
     VertexArray lightCube;
     lightCube.bufferMesh(createCubeMesh({2.5f, 2.5f, 2.5f}));
 
-    Texture2d texture;
-    texture.loadTexture("grass.jpg");
+    VertexArray grassCube;
+    grassCube.bufferMesh(createGrassCubeMesh());
+
+    Texture2D texture;
+    texture.loadTexture("opengl_logo.png");
+
+    TextureArray2D textureArray;
+    textureArray.create(16, 16);
+    textureArray.addTexture("opengl_logo.png");
+    textureArray.addTexture("opengl_logo.png");
+    textureArray.addTexture("opengl_logo.png");
+    textureArray.addTexture("opengl_logo.png");
+    textureArray.addTexture("opengl_logo.png");
 
     Framebuffer framebuffer(WIDTH, HEIGHT);
-    const Texture2d* colour = framebuffer.addTexture();
+    const Texture2D* colour = framebuffer.addTexture();
     framebuffer.finish();
 
     Transform quadTransform;
@@ -112,16 +125,13 @@ int main()
 
         // R e n d e r
         // To the framebuffer
+        glEnable(GL_DEPTH_TEST);
         framebuffer.bind();
+
+        // Render the regular scene
         sceneShader.bind();
         sceneShader.set("projectionViewMatrix", projectionViewMatrix);
-        sceneShader.set("lightColour", glm::vec3{1, 1, 1});
-        sceneShader.set("lightPosition", lightPosition);
-        sceneShader.set("viewerPosition", camera.position);
-        sceneShader.set("isLightSource", false);
         texture.bind();
-
-        glEnable(GL_DEPTH_TEST);
 
         auto modelMatrix = createModelMatrix(quadTransform);
         sceneShader.set("modelMatrix", modelMatrix);
@@ -136,8 +146,17 @@ int main()
         glm::mat4 lightModel{1.0f};
         lightModel = glm::translate(lightModel, lightPosition);
         sceneShader.set("modelMatrix", lightModel);
-        sceneShader.set("isLightSource", true);
-        glDrawElements(GL_TRIANGLES, terrain.indicesCount(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, lightCube.indicesCount(), GL_UNSIGNED_INT, 0);
+
+        // Render the voxels/chunks/mesh chunk/ voxel mesh forms
+        voxelShader.bind();
+        voxelShader.set("projectionViewMatrix", projectionViewMatrix);
+        textureArray.bind();
+
+        glm::mat4 voxelModel{1.0f};
+        voxelModel = glm::translate(voxelModel, {0, 10, 0});
+        voxelShader.set("modelMatrix", voxelModel);
+        glDrawElements(GL_TRIANGLES, grassCube.indicesCount(), GL_UNSIGNED_INT, 0);
 
         // To the window
         Framebuffer::unbind();

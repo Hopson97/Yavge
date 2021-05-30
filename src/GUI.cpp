@@ -10,8 +10,9 @@
 
 struct nk_context* ctx;
 sf::Clock fpsClock;
-int frames = 0;
-int fps;
+float frames = 0;
+float fps;
+float frameTime = 0;
 
 const sf::Window* p_window = nullptr;
 
@@ -41,6 +42,8 @@ void guiBeginFrame(void)
     frames++;
     if (fpsClock.getElapsedTime().asSeconds() >= 1.0f) {
         fps = frames;
+        frameTime = (float)fpsClock.getElapsedTime().asMilliseconds() / frames;
+
         fpsClock.restart();
         frames = 0;
     }
@@ -73,7 +76,8 @@ void guiDebugScreen(const Transform& transform)
 
         nk_layout_row_dynamic(ctx, 25, 1);
 
-        nk_labelf(ctx, NK_STATIC, "FPS: %d", fps);
+        nk_labelf(ctx, NK_STATIC, "FPS: %f", fps);
+        nk_labelf(ctx, NK_STATIC, "Frame Time: %f", frameTime);
     }
     nk_end(ctx);
 }
