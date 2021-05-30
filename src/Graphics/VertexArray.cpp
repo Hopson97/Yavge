@@ -1,5 +1,6 @@
 #include "VertexArray.h"
 #include <glm/glm.hpp>
+#include <iostream>
 
 VertexArray::VertexArray()
 {
@@ -68,11 +69,12 @@ void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
 
 void VertexArray::bufferVertexData(const std::vector<VoxelVertex>& verts)
 {
+    std::cout << "voxel vetrtex" <<std::endl;
     // glBufferData
-    glNamedBufferStorage(m_vbo, sizeof(Vertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(m_vbo, sizeof(VoxelVertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
 
     // Attach the vertex array to the vertex buffer and element buffer
-    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(Vertex));
+    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(VoxelVertex));
 
     // glEnableVertexAttribArray
     glEnableVertexArrayAttrib(m_vao, 0);

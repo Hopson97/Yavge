@@ -78,8 +78,8 @@ int main()
 
     TextureArray2D textureArray;
     textureArray.create(16, 16);
-    textureArray.addTexture("dirt.png");
     textureArray.addTexture("grass_side.png");
+    textureArray.addTexture("dirt.png");
     textureArray.addTexture("grass.png");
 
     Framebuffer framebuffer(WIDTH, HEIGHT);
@@ -147,6 +147,7 @@ int main()
         glDrawElements(GL_TRIANGLES, lightCube.indicesCount(), GL_UNSIGNED_INT, 0);
 
         // Render the voxels/chunks/mesh chunk/ voxel mesh forms
+        grassCube.bind();
         voxelShader.bind();
         voxelShader.set("projectionViewMatrix", projectionViewMatrix);
         textureArray.bind();
