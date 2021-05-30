@@ -14,12 +14,12 @@ VertexArray& VertexArray::operator=(VertexArray&& other)
     m_vao = other.m_vao;
     m_vbo = other.m_vbo;
     m_ibo = other.m_ibo;
-    m_indexCount = other.m_indexCount;
+    m_numIndices = other.m_numIndices;
 
     other.m_vao = 0;
     other.m_vbo = 0;
     other.m_ibo = 0;
-    other.m_indexCount = 0;
+    other.m_numIndices = 0;
 
     return *this;
 }
@@ -28,12 +28,12 @@ VertexArray::VertexArray(VertexArray&& other)
     : m_vao{other.m_vao}
     , m_vbo{other.m_vbo}
     , m_ibo{other.m_ibo}
-    , m_indexCount{other.m_indexCount}
+    , m_numIndices{other.m_numIndices}
 {
     other.m_vao = 0;
     other.m_vbo = 0;
     other.m_ibo = 0;
-    other.m_indexCount = 0;
+    other.m_numIndices = 0;
 }
 
 VertexArray::~VertexArray()
@@ -69,7 +69,7 @@ void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
 
 void VertexArray::bufferVertexData(const std::vector<VoxelVertex>& verts)
 {
-    std::cout << "voxel vetrtex" <<std::endl;
+    std::cout << "voxel vetrtex" << std::endl;
     // glBufferData
     glNamedBufferStorage(m_vbo, sizeof(VoxelVertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
 
@@ -94,7 +94,7 @@ void VertexArray::bufferIndicesData(const std::vector<GLuint> indices)
 {
     glNamedBufferStorage(m_ibo, sizeof(GLuint) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
     glVertexArrayElementBuffer(m_vao, m_ibo);
-    m_indexCount = indices.size();
+    m_numIndices = indices.size();
 }
 
 void VertexArray::bufferMesh(const Mesh& mesh)
@@ -109,12 +109,19 @@ void VertexArray::bufferMesh(const VoxelMesh& mesh)
     bufferIndicesData(mesh.indices);
 }
 
-GLsizei VertexArray::indicesCount()
+Renderable VertexArray::getRendable()
 {
-    return m_indexCount;
+    return {m_vao, m_numIndices};
 }
 
-void VertexArray::bind() const
+void Renderable::drawArrays(GLsizei count) const
 {
-    glBindVertexArray(m_vao);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, count);
+}
+
+void Renderable::drawElements() const
+{
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, nullptr);
 }

@@ -101,8 +101,8 @@ void TextureArray2D::create(GLuint textureDims, GLuint textureCount)
 
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glTextureStorage3D(m_handle, 1, GL_RGBA8, textureDims, textureDims, textureCount);
 }
@@ -123,7 +123,6 @@ GLuint TextureArray2D::addTexture(const char* file)
 
     glTextureSubImage3D(m_handle, 0, 0, 0, m_textureCount, m_textureDims, m_textureDims, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                         img.getPixelsPtr());
-
 
     return m_textureCount++;
 }

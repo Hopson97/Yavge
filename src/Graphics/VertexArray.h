@@ -8,6 +8,9 @@
 struct Renderable {
     GLuint vao = 0;
     GLuint indices = 0;
+
+    void drawArrays(GLsizei count) const;
+    void drawElements() const;
 };
 
 class VertexArray final {
@@ -16,9 +19,8 @@ class VertexArray final {
 
     void bufferMesh(const Mesh& mesh);
     void bufferMesh(const VoxelMesh& mesh);
-    void bind() const;
 
-    GLsizei indicesCount();
+    Renderable getRendable();
 
   private:
     void bufferVertexData(const std::vector<Vertex>& verts);
@@ -28,7 +30,7 @@ class VertexArray final {
     GLuint m_vao = 0;
     GLuint m_vbo = 0;
     GLuint m_ibo = 0;
-    GLuint m_indexCount = 0;
+    GLuint m_numIndices = 0;
 
   public:
     VertexArray& operator=(VertexArray&& other);

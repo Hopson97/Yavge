@@ -74,40 +74,98 @@ Mesh createCubeMesh(const glm::vec3& dimensions)
     return mesh;
 }
 
-struct NoiseOptions {
-    float roughness;
-    float smoothness;
-    float amplitude;
-
-    int octaves;
-    float offset;
-};
-
-float getNoiseAt(const glm::ivec2& position, int seed, NoiseOptions& options)
+VoxelMesh createGrassCubeMesh()
 {
-    float value = 0;
-    float acc = 0;
-    for (int i = 0; i < options.octaves; i++) {
-        float frequency = glm::pow(2.0f, i);
-        float amplitude = glm::pow(options.roughness, i);
+    VoxelMesh mesh;
 
-        float x = position.x * frequency / options.smoothness;
-        float z = position.y * frequency / options.smoothness;
+    float w = 1;
+    float h = 1;
+    float d = 1;
 
-        float noiseValue = glm::simplex(glm::vec3{x, z, seed});
-        noiseValue = (noiseValue + 1.0f) / 2.0f;
-        value += noiseValue * amplitude;
-        acc += amplitude;
+    // clang-format off
+    mesh.vertices = {
+        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{0, h, d}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{w, 0, d}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+
+        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, h, 0}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+
+        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{w, h, 0}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{0, 0, 0}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+
+        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, h, d}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, 0, 0}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+
+        {{w, h, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{0, h, 0}, {0.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0, h, d}, {0.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{w, h, d}, {1.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
+
+        {{0, 0, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{w, 0, 0}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+        {{w, 0, d}, {0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{0, 0, d}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+    };
+    // clang-format on
+
+    int currIndex = 0;
+    for (int i = 0; i < 6; i++) {
+        mesh.indices.push_back(currIndex);
+        mesh.indices.push_back(currIndex + 1);
+        mesh.indices.push_back(currIndex + 2);
+        mesh.indices.push_back(currIndex + 2);
+        mesh.indices.push_back(currIndex + 3);
+        mesh.indices.push_back(currIndex);
+        currIndex += 4;
     }
-    return value / acc * options.amplitude + options.offset;
+
+    return mesh;
 }
 
-constexpr int SIZE = 128;
-constexpr int EDGE_VERTEX_COUNT = 128;
-constexpr int HEIGHT_MAP_WIDTH = EDGE_VERTEX_COUNT + 2;
-constexpr int AREA = EDGE_VERTEX_COUNT * EDGE_VERTEX_COUNT;
-constexpr GLfloat fEDGE_VERTEX_COUNT = GLfloat(EDGE_VERTEX_COUNT - 1);
+namespace {
 
+    struct NoiseOptions {
+        float roughness;
+        float smoothness;
+        float amplitude;
+
+        int octaves;
+        float offset;
+    };
+
+    float getNoiseAt(const glm::ivec2& position, int seed, NoiseOptions& options)
+    {
+        float value = 0;
+        float acc = 0;
+        for (int i = 0; i < options.octaves; i++) {
+            float frequency = glm::pow(2.0f, i);
+            float amplitude = glm::pow(options.roughness, i);
+
+            float x = position.x * frequency / options.smoothness;
+            float z = position.y * frequency / options.smoothness;
+
+            float noiseValue = glm::simplex(glm::vec3{x, z, seed});
+            noiseValue = (noiseValue + 1.0f) / 2.0f;
+            value += noiseValue * amplitude;
+            acc += amplitude;
+        }
+        return value / acc * options.amplitude + options.offset;
+    }
+
+    constexpr int SIZE = 128;
+    constexpr int EDGE_VERTEX_COUNT = 128;
+    constexpr int HEIGHT_MAP_WIDTH = EDGE_VERTEX_COUNT + 2;
+    constexpr int AREA = EDGE_VERTEX_COUNT * EDGE_VERTEX_COUNT;
+    constexpr GLfloat fEDGE_VERTEX_COUNT = GLfloat(EDGE_VERTEX_COUNT - 1);
+} // namespace
 Mesh createTerrainMesh()
 {
     NoiseOptions terrainNoise;
@@ -187,61 +245,5 @@ Mesh createTerrainMesh()
             mesh.indices.push_back(bottomRight);
         }
     }
-    return mesh;
-}
-
-VoxelMesh createGrassCubeMesh()
-{
-    VoxelMesh mesh;
-
-    float w = 1;
-    float h = 1;
-    float d = 1;
-
-    // clang-format off
-    mesh.vertices = {
-        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
-        {{0, h, d}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
-        {{w, 0, d}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-
-        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
-        {{0, h, 0}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
-        {{0, 0, d}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-
-        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
-        {{w, h, 0}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
-        {{0, 0, 0}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-
-        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
-        {{w, h, d}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
-        {{w, 0, 0}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-
-        {{w, h, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
-        {{0, h, 0}, {0.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0, h, d}, {0.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
-        {{w, h, d}, {1.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
-
-        {{0, 0, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
-        {{w, 0, 0}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
-        {{0, 0, d}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-    };
-    // clang-format on
-
-    int currIndex = 0;
-    for (int i = 0; i < 6; i++) {
-        mesh.indices.push_back(currIndex);
-        mesh.indices.push_back(currIndex + 1);
-        mesh.indices.push_back(currIndex + 2);
-        mesh.indices.push_back(currIndex + 2);
-        mesh.indices.push_back(currIndex + 3);
-        mesh.indices.push_back(currIndex);
-        currIndex += 4;
-    }
-
     return mesh;
 }

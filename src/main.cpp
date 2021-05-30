@@ -134,20 +134,15 @@ int main()
         auto modelMatrix = createModelMatrix(quadTransform);
         sceneShader.set("modelMatrix", modelMatrix);
 
-        quad.bind();
-        glDrawElements(GL_TRIANGLES, quad.indicesCount(), GL_UNSIGNED_INT, 0);
+        quad.getRendable().drawElements();
+        terrain.getRendable().drawElements();
 
-        terrain.bind();
-        glDrawElements(GL_TRIANGLES, terrain.indicesCount(), GL_UNSIGNED_INT, 0);
-
-        lightCube.bind();
         glm::mat4 lightModel{1.0f};
         lightModel = glm::translate(lightModel, lightPosition);
         sceneShader.set("modelMatrix", lightModel);
-        glDrawElements(GL_TRIANGLES, lightCube.indicesCount(), GL_UNSIGNED_INT, 0);
+        lightCube.getRendable().drawElements();
 
         // Render the voxels/chunks/mesh chunk/ voxel mesh forms
-        grassCube.bind();
         voxelShader.bind();
         voxelShader.set("projectionViewMatrix", projectionViewMatrix);
         textureArray.bind();
@@ -155,15 +150,14 @@ int main()
         glm::mat4 voxelModel{1.0f};
         voxelModel = glm::translate(voxelModel, {0, 10, 0});
         voxelShader.set("modelMatrix", voxelModel);
-        glDrawElements(GL_TRIANGLES, grassCube.indicesCount(), GL_UNSIGNED_INT, 0);
+        grassCube.getRendable().drawElements();
 
         // To the window
         Framebuffer::unbind();
         screenShader.bind();
         colour->bind();
 
-        screen.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        screen.getRendable().drawArrays(6);
 
         guiDebugScreen(camera);
         guiEndFrame();
