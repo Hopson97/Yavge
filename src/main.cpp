@@ -14,7 +14,7 @@ int main()
     }
     window.setFramerateLimit(60);
     guiInit(window);
-    glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
+    glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
 
     // Final render target
     VertexArray screen;

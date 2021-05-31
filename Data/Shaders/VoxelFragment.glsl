@@ -7,8 +7,12 @@ in vec3 passFragPosition;
 out vec4 outColour;
 
 uniform sampler2DArray diffuseTexture;
+uniform vec3 lightColour;
 
 void main()
 {
-    outColour = texture(diffuseTexture, passTextureCoord);
+    vec3 ambient = 0.1 * lightColour;
+
+    vec4 result = vec4(ambient, 1.0); 
+    outColour = texture(diffuseTexture, passTextureCoord) * result;
 }

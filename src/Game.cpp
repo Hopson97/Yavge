@@ -5,7 +5,7 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 32;
+constexpr int WORLD_SIZE = 16;
 
 Game::Game()
 {
@@ -15,24 +15,20 @@ Game::Game()
   
     m_quad      .bufferMesh(createQuadMesh());
     m_terrain   .bufferMesh(createTerrainMesh());
-    m_lightCube .bufferMesh(createCubeMesh({2.5f, 2.5f, 2.5f}));
+    m_lightCube .bufferMesh(createCubeMesh({25.5f, 25.5f, 25.5f}));
     m_grassCube .bufferMesh(createGrassCubeMesh());
 
     m_texture.loadTexture("opengl_logo.png");
     m_textureArray.create(16, 16);
     initVoxelSystem(m_textureArray);
 
-
-    m_cameraTransform = { {0, 0, 2}, {0, -90, 0} };
-
-    m_lightCubeTransform.position = {66, 33, 66};
+    m_cameraTransform = { {300, 50, 300}, {0, -90, 0} };
+    m_sun.t.position.z = WORLD_SIZE * CHUNK_SIZE / 2 - CHUNK_SIZE / 2;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
-
-
-    for (int x = 0; x < WORLD_SIZE; x++) {
+    for (int x = WORLD_SIZE; x >= 0; x--) {
         for (int z = 0; z < WORLD_SIZE; z++) {
             m_chunkUpdateQueue.push({x, 0, z});
         }
@@ -41,6 +37,8 @@ Game::Game()
     m_chunkMeshGenThread = std::thread([&]{
         runTerrainThread();
     });
+
+    glCullFace(GL_BACK);
 
     // clang-format on
 }
@@ -87,17 +85,20 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate()
 {
-    m_lightCubeTransform.position.x += sin(m_timer.getElapsedTime().asSeconds()) / 16;
-    m_lightCubeTransform.position.z += cos(m_timer.getElapsedTime().asSeconds()) / 16;
+    m_sun.update(m_timer.getElapsedTime().asMilliseconds());
 }
 
 void Game::onRender()
 {
+    glDisable(GL_CULL_FACE);
     auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
 
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
+    m_sceneShader.set("isLight", false);
+    m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+
     m_texture.bind();
 
     auto modelMatrix = createModelMatrix(m_quadTransform);
@@ -106,25 +107,28 @@ void Game::onRender()
     m_quad.getRendable().drawElements();
 
     glm::mat4 terrainModel{1.0f};
-    terrainModel = glm::translate(terrainModel, {100, 10, 100});
+    terrainModel = glm::translate(terrainModel, {-30, 10, -40});
     m_sceneShader.set("modelMatrix", terrainModel);
     m_terrain.getRendable().drawElements();
 
-    auto lightModel = createModelMatrix(m_lightCubeTransform);
+    glEnable(GL_CULL_FACE);
+    auto lightModel = createModelMatrix(m_sun.t);
     m_sceneShader.set("modelMatrix", lightModel);
+    m_sceneShader.set("isLight", true);
     m_lightCube.getRendable().drawElements();
 
-    // Render the voxels/chunks/mesh chunk/ voxel mesh forms
+    // Render the chunk
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
+    m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_textureArray.bind();
 
     glm::mat4 voxelModel{1.0f};
-    voxelModel = glm::translate(voxelModel, {0, 10, 0});
+    voxelModel = glm::translate(voxelModel, {0, 0, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
     m_grassCube.getRendable().drawElements();
 
-    voxelModel = glm::translate(voxelModel, {-100, -100, 0});
+    voxelModel = glm::translate(voxelModel, {0, 0, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
 
     {
@@ -150,6 +154,7 @@ void Game::onRender()
 void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform);
+    gameDebugScreen(m_sun);
 }
 
 void Game::runTerrainThread()

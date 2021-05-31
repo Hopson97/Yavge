@@ -163,7 +163,7 @@ std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, in
     for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
         Chunk& chunk = chunkmap.addChunk({chunkX, y, chunkZ});
         createTerrain(chunk, heightMap, biomeMap);
-     //   chunkmap.ensureNeighbours(chunk.position());
+        //   chunkmap.ensureNeighbours(chunk.position());
         positions.push_back({chunkX, y, chunkZ});
         chunk.hasTerrain = true;
     }
