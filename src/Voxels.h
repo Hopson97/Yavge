@@ -17,17 +17,20 @@ enum VoxelType : uint16_t {
 
 struct Voxel {
     Voxel() = default;
-    Voxel(const char* name, GLuint textureTop, GLuint textureSide, GLuint textureBottom)
+    Voxel(const char* name, GLuint textureTop, GLuint textureSide, GLuint textureBottom, bool isTransparent)
         : name{name}
         , textureTop{textureTop}
         , textureSide{textureSide}
         , textureBottom{textureBottom}
+        , isTransparent(isTransparent)
     {
     }
     const char* name;
     GLuint textureTop;
     GLuint textureSide;
     GLuint textureBottom;
+
+    bool isTransparent;
 };
 
 void initVoxelSystem(TextureArray2D& textureArray);

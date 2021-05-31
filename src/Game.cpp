@@ -15,20 +15,20 @@ Game::Game()
   
     m_quad      .bufferMesh(createQuadMesh());
     m_terrain   .bufferMesh(createTerrainMesh());
-    m_lightCube .bufferMesh(createCubeMesh({25.5f, 25.5f, 25.5f}));
+    m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
     m_grassCube .bufferMesh(createGrassCubeMesh());
 
     m_texture.loadTexture("opengl_logo.png");
     m_textureArray.create(16, 16);
     initVoxelSystem(m_textureArray);
 
-    m_cameraTransform = { {300, 50, 300}, {0, -90, 0} };
-    m_sun.t.position.z = WORLD_SIZE * CHUNK_SIZE / 2 - CHUNK_SIZE / 2;
+    m_cameraTransform = { {0, CHUNK_SIZE * 5, 0}, {0, -90, 0} };
+    m_sun.t.position.y = CHUNK_SIZE * 4;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
-    for (int x = WORLD_SIZE; x >= 0; x--) {
+    for (int x = 0; x < WORLD_SIZE; x++) {
         for (int z = 0; z < WORLD_SIZE; z++) {
             m_chunkUpdateQueue.push({x, 0, z});
         }
@@ -98,6 +98,8 @@ void Game::onRender()
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
     m_sceneShader.set("isLight", false);
     m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+    m_sceneShader.set("lightPosition", m_sun.t.position);
+    m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
     m_texture.bind();
 
@@ -107,7 +109,7 @@ void Game::onRender()
     m_quad.getRendable().drawElements();
 
     glm::mat4 terrainModel{1.0f};
-    terrainModel = glm::translate(terrainModel, {-30, 10, -40});
+    terrainModel = glm::translate(terrainModel, {-30, CHUNK_SIZE * 3, -40});
     m_sceneShader.set("modelMatrix", terrainModel);
     m_terrain.getRendable().drawElements();
 
@@ -121,6 +123,9 @@ void Game::onRender()
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+    m_voxelShader.set("lightPosition", m_sun.t.position);
+    m_voxelShader.set("eyePosition", m_cameraTransform.position);
+
     m_textureArray.bind();
 
     glm::mat4 voxelModel{1.0f};
@@ -135,30 +140,47 @@ void Game::onRender()
         std::unique_lock<std::mutex> l(m_chunkVectorLock);
         while (!m_chunkMeshQueue.empty()) {
 
-            ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
+            ChunkMeshes mesh = std::move(m_chunkMeshQueue.front());
             m_chunkMeshQueue.pop();
 
             VertexArray chunkVertexArray;
-            chunkVertexArray.bufferMesh(mesh);
+            VertexArray transparentVertexArray;
+            if (mesh.solidChunk.indicesCount > 0) {
+                chunkVertexArray.bufferMesh(mesh.solidChunk);
+                m_chunkRenderList.push_back(chunkVertexArray.getRendable());
+            }
+            if (mesh.transparentChunk.indicesCount > 0) {
 
-            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
+                transparentVertexArray.bufferMesh(mesh.transparentChunk);
+                m_transparentChunkRenderList.push_back(transparentVertexArray.getRendable());
+            }
+
             m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+            m_chunkVertexArrays.push_back(std::move(transparentVertexArray));
         }
     }
 
     for (auto& chunk : m_chunkRenderList) {
         chunk.drawElements();
     }
+    glEnable(GL_BLEND);
+
+    for (auto& chunk : m_transparentChunkRenderList) {
+        chunk.drawElements();
+    }
+    glDisable(GL_BLEND);
 }
 
 void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform);
-    gameDebugScreen(m_sun);
+    // gameDebugScreen(m_sun);
 }
 
 void Game::runTerrainThread()
 {
+    std::srand(std::time(0));
+    int seed = std::rand() % 30000;
     while (m_isRunning) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
 
@@ -167,7 +189,7 @@ void Game::runTerrainThread()
             if (!m_chunkUpdateQueue.empty()) {
                 ChunkPosition& p = m_chunkUpdateQueue.front();
                 m_chunkUpdateQueue.pop();
-                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, WORLD_SIZE);
+                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, WORLD_SIZE, seed);
                 for (const auto& p : pos) {
                     m_chunkReadyForMeshingQueue.push(p);
                 }
@@ -179,7 +201,7 @@ void Game::runTerrainThread()
                 std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
                 auto p = m_chunkReadyForMeshingQueue.front();
                 if (m_chunkMap.hasNeighbours(p)) {
-                    m_chunkMeshQueue.push(createChunkMesh(m_chunkMap.getChunk(p)));
+                    m_chunkMeshQueue.push(createChunkMeshes(m_chunkMap.getChunk(p)));
                     m_chunkReadyForMeshingQueue.pop();
                 }
             }

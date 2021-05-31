@@ -5,6 +5,7 @@
 #include <cstring>
 #include <functional>
 #include <glm/gtc/noise.hpp>
+#include <iostream>
 
 namespace {
     struct NoiseOptions {
@@ -151,10 +152,10 @@ namespace {
 
 } // namespace
 
-std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize)
+std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize, int seed)
 {
+    std::cout << "SEED: " << seed << "\n";
     std::vector<ChunkPosition> positions;
-    int seed = 26346;
     ChunkPosition position{chunkX, 0, chunkZ};
 
     auto heightMap = createChunkHeightMap(position, worldSize, seed);

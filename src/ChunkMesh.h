@@ -28,5 +28,10 @@ struct ChunkMesh {
                       GLfloat textureId);
 };
 
-ChunkMesh createChunkMesh(const Chunk& chunk);
+struct ChunkMeshes {
+    ChunkMesh solidChunk;
+    ChunkMesh transparentChunk;
+};
+
+ChunkMeshes createChunkMeshes(const Chunk& chunk);
 ChunkMesh createGrassCubeMesh();

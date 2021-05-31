@@ -12,16 +12,16 @@ void initVoxelSystem(TextureArray2D& textureArray)
     GLuint tGrass = textureArray.addTexture("grass.png");
     GLuint tGrassSide = textureArray.addTexture("grass_side.png");
     GLuint tDirt = textureArray.addTexture("dirt.png");
-    GLuint tStone = textureArray.addTexture("grass.png");
+    GLuint tStone = textureArray.addTexture("stone.png");
     GLuint tWater = textureArray.addTexture("water.png");
     GLuint tSand = textureArray.addTexture("sand.png");
 
-    voxels[AIR] = {"Air", 0, 0, 0};
-    voxels[GRASS] = {"Grass", tGrass, tGrassSide, tDirt};
-    voxels[DIRT] = {"Grass", tDirt, tDirt, tDirt};
-    voxels[STONE] = {"Stone", tStone, tStone, tStone};
-    voxels[WATER] = {"Water", tWater, tWater, tWater};
-    voxels[SAND] = {"Water", tSand, tSand, tSand};
+    voxels[AIR] = {"Air", 0, 0, 0, false};
+    voxels[GRASS] = {"Grass", tGrass, tGrassSide, tDirt, false};
+    voxels[DIRT] = {"Grass", tDirt, tDirt, tDirt, false};
+    voxels[STONE] = {"Stone", tStone, tStone, tStone, false};
+    voxels[WATER] = {"Water", tWater, tWater, tWater, true};
+    voxels[SAND] = {"Sand", tSand, tSand, tSand, false};
 }
 
 const Voxel& getVoxelType(VoxelType type)

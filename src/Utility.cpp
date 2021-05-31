@@ -40,6 +40,7 @@ static void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint, GLenu
 
     fprintf(stderr, "OpenGL Message.\n Type: %s\nSeverity: %s\nSource: %s\nMessage: %s\n\n", typeString, severityString,
             sourceString, message);
+    throw(std::runtime_error("GL Error"));
 }
 
 static void initGLDebug()

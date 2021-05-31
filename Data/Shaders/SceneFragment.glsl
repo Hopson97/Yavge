@@ -8,6 +8,8 @@ out vec4 outColour;
 
 uniform sampler2D diffuseTexture;
 uniform vec3 lightColour;
+uniform vec3 lightPosition;
+uniform vec3 eyePosition;
 
 uniform bool isLight;
 
@@ -16,9 +18,20 @@ void main()
     outColour = texture(diffuseTexture, passTextureCoord);
     if (!isLight) {
         vec3 ambient = 0.1 * lightColour;
-        
-        vec4 result = vec4(ambient, 1.0); 
 
+        vec3 normal = normalize(passNormal);
+        vec3 lightDirection = normalize(lightPosition - passFragPosition);
+        vec3 eyeDirection = normalize(eyePosition - passFragPosition);
+
+        vec3 reflectDirection = reflect(-lightDirection, normal);
+
+        float spec = pow(max(dot(eyeDirection, reflectDirection), 0.0), 32);
+        vec3 specular = 0.5 * spec * lightColour;
+
+        float diff = max(dot(normal, lightDirection), 0.0);
+        vec3 diffuse = lightColour * diff;
+
+        vec4 result = vec4(ambient + specular + diffuse, 1.0); 
         outColour *= result;
     }
 }

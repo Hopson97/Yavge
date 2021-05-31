@@ -18,16 +18,13 @@ class Keyboard;
 
 struct Sun {
     Transform t;
-    int orbitRadius = CHUNK_SIZE * CHUNK_SIZE;
+    int orbitRadius = CHUNK_SIZE * 4;
     int orbitSpeed = 8000;
     void update(float time)
     {
         float rads = (2.0f * 3.14159f / orbitSpeed * time);
-
-        std::cout << rads << std::endl;
-
-        t.position.x = sin(rads) * orbitRadius;
-        t.position.y = cos(rads) * orbitRadius;
+        t.position.x = CHUNK_SIZE * 10 + sin(rads) * orbitRadius;
+        t.position.z = CHUNK_SIZE * 10 + cos(rads) * orbitRadius;
     }
 };
 
@@ -61,11 +58,14 @@ class Game {
     const Texture2D* m_frambufferTexture = nullptr;
 
     ChunkMap m_chunkMap;
-    std::queue<ChunkMesh> m_chunkMeshQueue;
+
+    std::queue<ChunkMeshes> m_chunkMeshQueue;
     std::queue<ChunkPosition> m_chunkReadyForMeshingQueue;
     std::queue<ChunkPosition> m_chunkUpdateQueue;
+
     std::vector<VertexArray> m_chunkVertexArrays;
     std::vector<Renderable> m_chunkRenderList;
+    std::vector<Renderable> m_transparentChunkRenderList;
 
     Sun m_sun;
     Transform m_cameraTransform;

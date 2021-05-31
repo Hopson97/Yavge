@@ -13,11 +13,17 @@ namespace {
 
     const std::array<glm::vec2, 4> textureCoords = {v2{1.0f, 0.0f}, v2{0.0f, 0.0f}, v2{0.0f, 1.0f}, v2{1.0f, 1.0f}};
 
-    bool shouldMakeFace(VoxelID /*thisId*/, VoxelID compareId)
+    bool shouldMakeFace(VoxelID thisId, VoxelID compareId)
     {
         VoxelID air = 0;
 
+        // auto& thisVoxel = getVoxelType((VoxelType)thisId);
+        auto& compareVoxel = getVoxelType((VoxelType)compareId);
+
         if (compareId == air) {
+            return true;
+        }
+        else if (thisId != compareId && compareVoxel.isTransparent) {
             return true;
         }
         return false;
@@ -43,9 +49,9 @@ void ChunkMesh::addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chu
     indicesCount += 4;
 }
 
-ChunkMesh createChunkMesh(const Chunk& chunk)
+ChunkMeshes createChunkMeshes(const Chunk& chunk)
 {
-    ChunkMesh mesh;
+    ChunkMeshes meshes;
     auto p = chunk.position();
 
     for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -55,6 +61,9 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
                 VoxelPosition voxelPosition(x, y, z);
                 auto voxel = chunk.qGetVoxel(voxelPosition);
                 if (voxel > 0) {
+
+                    ChunkMesh& mesh =
+                        getVoxelType((VoxelType)voxel).isTransparent ? meshes.transparentChunk : meshes.solidChunk;
 
                     auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
@@ -92,7 +101,7 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
         }
     }
 
-    return mesh;
+    return meshes;
 }
 
 ChunkMesh createGrassCubeMesh()

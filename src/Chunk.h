@@ -11,7 +11,7 @@ constexpr int CHUNK_SIZE = 32;
 constexpr int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 constexpr int CHUNK_VLME = CHUNK_AREA * CHUNK_SIZE;
 
-constexpr int WATER_LEVEL = 33;
+constexpr int WATER_LEVEL = CHUNK_SIZE * 2;
 
 using VoxelPosition = glm::ivec3;
 using ChunkPosition = glm::ivec3;
