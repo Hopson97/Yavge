@@ -74,62 +74,6 @@ Mesh createCubeMesh(const glm::vec3& dimensions)
     return mesh;
 }
 
-VoxelMesh createGrassCubeMesh()
-{
-    VoxelMesh mesh;
-
-    float w = 1;
-    float h = 1;
-    float d = 1;
-
-    // clang-format off
-    mesh.vertices = {
-        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
-        {{0, h, d}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
-        {{w, 0, d}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-
-        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
-        {{0, h, 0}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
-        {{0, 0, d}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-
-        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
-        {{w, h, 0}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
-        {{0, 0, 0}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-
-        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
-        {{w, h, d}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
-        {{w, 0, 0}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-
-        {{w, h, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
-        {{0, h, 0}, {0.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0, h, d}, {0.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
-        {{w, h, d}, {1.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
-
-        {{0, 0, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
-        {{w, 0, 0}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
-        {{0, 0, d}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-    };
-    // clang-format on
-
-    int currIndex = 0;
-    for (int i = 0; i < 6; i++) {
-        mesh.indices.push_back(currIndex);
-        mesh.indices.push_back(currIndex + 1);
-        mesh.indices.push_back(currIndex + 2);
-        mesh.indices.push_back(currIndex + 2);
-        mesh.indices.push_back(currIndex + 3);
-        mesh.indices.push_back(currIndex);
-        currIndex += 4;
-    }
-
-    return mesh;
-}
-
 namespace {
 
     struct NoiseOptions {

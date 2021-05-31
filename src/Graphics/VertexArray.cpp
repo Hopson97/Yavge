@@ -69,7 +69,6 @@ void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
 
 void VertexArray::bufferVertexData(const std::vector<VoxelVertex>& verts)
 {
-    std::cout << "voxel vetrtex" << std::endl;
     // glBufferData
     glNamedBufferStorage(m_vbo, sizeof(VoxelVertex) * verts.size(), verts.data(), GL_DYNAMIC_STORAGE_BIT);
 
@@ -103,7 +102,7 @@ void VertexArray::bufferMesh(const Mesh& mesh)
     bufferIndicesData(mesh.indices);
 }
 
-void VertexArray::bufferMesh(const VoxelMesh& mesh)
+void VertexArray::bufferMesh(const ChunkMesh& mesh)
 {
     bufferVertexData(mesh.vertices);
     bufferIndicesData(mesh.indices);

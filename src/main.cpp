@@ -1,7 +1,11 @@
+#include "Chunk.h"
 #include "GUI.h"
 #include "Graphics/GLWrappers.h"
 #include "Maths.h"
 #include "Utility.h"
+
+#include "ChunkMesh.h"
+#include "ChunkTerrainGen.h"
 
 bool mouseActive = true;
 Transform camera{
@@ -82,6 +86,20 @@ int main()
     textureArray.addTexture("dirt.png");
     textureArray.addTexture("grass.png");
 
+    ChunkMap chunkMap;
+    constexpr int worldSize = 32;
+    auto pos = createChunkTerrains(chunkMap, worldSize);
+
+    std::vector<VertexArray> chunkVertexArrays;
+    std::vector<Renderable> chunkRenderList;
+
+    for (const auto& p : pos) {
+        VertexArray v;
+        v.bufferMesh(createChunkMesh(chunkMap.getChunk(p)));
+        chunkRenderList.push_back(v.getRendable());
+        chunkVertexArrays.push_back(std::move(v));
+    }
+
     Framebuffer framebuffer(WIDTH, HEIGHT);
     const Texture2D* colour = framebuffer.addTexture();
     framebuffer.finish();
@@ -135,6 +153,10 @@ int main()
         sceneShader.set("modelMatrix", modelMatrix);
 
         quad.getRendable().drawElements();
+
+        glm::mat4 terrainModel{1.0f};
+        terrainModel = glm::translate(terrainModel, {100, 10, 100});
+        sceneShader.set("modelMatrix", terrainModel);
         terrain.getRendable().drawElements();
 
         glm::mat4 lightModel{1.0f};
@@ -151,6 +173,12 @@ int main()
         voxelModel = glm::translate(voxelModel, {0, 10, 0});
         voxelShader.set("modelMatrix", voxelModel);
         grassCube.getRendable().drawElements();
+
+        voxelModel = glm::translate(voxelModel, {-100, -100, 0});
+        voxelShader.set("modelMatrix", voxelModel);
+        for (auto& chunk : chunkRenderList) {
+            chunk.drawElements();
+        }
 
         // To the window
         Framebuffer::unbind();

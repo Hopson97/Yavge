@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../ChunkMesh.h"
 #include "Mesh.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -18,7 +19,7 @@ class VertexArray final {
     VertexArray();
 
     void bufferMesh(const Mesh& mesh);
-    void bufferMesh(const VoxelMesh& mesh);
+    void bufferMesh(const ChunkMesh& mesh);
 
     Renderable getRendable();
 
