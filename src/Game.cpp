@@ -5,6 +5,8 @@
 #include "Utility.h"
 #include "Voxels.h"
 
+constexpr int WORLD_SIZE = 32;
+
 Game::Game()
 {
     // clang-format off
@@ -20,13 +22,6 @@ Game::Game()
     m_textureArray.create(16, 16);
     initVoxelSystem(m_textureArray);
 
-    auto pos = createChunkTerrains(m_chunkMap, 25);
-    for (const auto& p : pos) {
-        VertexArray chunkVertexArray;
-        chunkVertexArray.bufferMesh(createChunkMesh(m_chunkMap.getChunk(p)));
-        m_chunkRenderList.push_back(chunkVertexArray.getRendable());
-        m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
-    }
 
     m_cameraTransform = { {0, 0, 2}, {0, -90, 0} };
 
@@ -35,7 +30,27 @@ Game::Game()
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
+
+
+    for (int x = 0; x < WORLD_SIZE; x++) {
+        for (int z = 0; z < WORLD_SIZE; z++) {
+            m_chunkUpdateQueue.push({x, 0, z});
+        }
+    }
+
+    m_chunkMeshGenThread = std::thread([&]{
+        runTerrainThread();
+    });
+
     // clang-format on
+}
+
+Game::~Game()
+{
+    m_isRunning = false;
+    if (m_chunkMeshGenThread.joinable()) {
+        m_chunkMeshGenThread.join();
+    }
 }
 
 void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
@@ -111,6 +126,22 @@ void Game::onRender()
 
     voxelModel = glm::translate(voxelModel, {-100, -100, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
+
+    {
+        std::unique_lock<std::mutex> l(m_chunkVectorLock);
+        while (!m_chunkMeshQueue.empty()) {
+
+            ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
+            m_chunkMeshQueue.pop();
+
+            VertexArray chunkVertexArray;
+            chunkVertexArray.bufferMesh(mesh);
+
+            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
+            m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+        }
+    }
+
     for (auto& chunk : m_chunkRenderList) {
         chunk.drawElements();
     }
@@ -119,4 +150,34 @@ void Game::onRender()
 void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform);
+}
+
+void Game::runTerrainThread()
+{
+    while (m_isRunning) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+
+        {
+            std::unique_lock<std::mutex> l(m_chunkUpdateLock);
+            if (!m_chunkUpdateQueue.empty()) {
+                ChunkPosition& p = m_chunkUpdateQueue.front();
+                m_chunkUpdateQueue.pop();
+                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, WORLD_SIZE);
+                for (const auto& p : pos) {
+                    m_chunkReadyForMeshingQueue.push(p);
+                }
+            }
+        }
+
+        {
+            if (!m_chunkReadyForMeshingQueue.empty()) {
+                std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
+                auto p = m_chunkReadyForMeshingQueue.front();
+                if (m_chunkMap.hasNeighbours(p)) {
+                    m_chunkMeshQueue.push(createChunkMesh(m_chunkMap.getChunk(p)));
+                    m_chunkReadyForMeshingQueue.pop();
+                }
+            }
+        }
+    }
 }

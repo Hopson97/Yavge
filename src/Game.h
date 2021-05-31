@@ -5,13 +5,20 @@
 #include "Maths.h"
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Window.hpp>
+#include <queue>
 #include <vector>
+
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 class Keyboard;
 
 class Game {
   public:
     Game();
+    ~Game();
 
     void onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive);
 
@@ -22,6 +29,8 @@ class Game {
     void onGUI();
 
   private:
+    void runTerrainThread();
+
     Shader m_sceneShader;
     Shader m_voxelShader;
 
@@ -35,6 +44,9 @@ class Game {
     const Texture2D* m_frambufferTexture = nullptr;
 
     ChunkMap m_chunkMap;
+    std::queue<ChunkMesh> m_chunkMeshQueue;
+    std::queue<ChunkPosition> m_chunkReadyForMeshingQueue;
+    std::queue<ChunkPosition> m_chunkUpdateQueue;
     std::vector<VertexArray> m_chunkVertexArrays;
     std::vector<Renderable> m_chunkRenderList;
 
@@ -45,4 +57,9 @@ class Game {
     glm::mat4 m_projectionMatrix;
 
     sf::Clock m_timer;
+
+    std::mutex m_chunkVectorLock;
+    std::mutex m_chunkUpdateLock;
+    std::thread m_chunkMeshGenThread;
+    std::atomic_bool m_isRunning{true};
 };

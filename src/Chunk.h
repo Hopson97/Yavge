@@ -45,6 +45,7 @@ class Chunk {
     {
         return m_position;
     };
+    bool hasTerrain = false;
 
   private:
     ChunkMap* m_pChunkMap;
@@ -58,6 +59,7 @@ class ChunkMap {
     ChunkMap()
         : empty(this, {0, 0, 0})
     {
+        empty.hasTerrain = true;
     }
 
     void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid);
@@ -67,6 +69,8 @@ class ChunkMap {
 
     Chunk& addChunk(const ChunkPosition& chunk);
     void ensureNeighbours(const ChunkPosition& chunkPosition);
+
+    bool hasNeighbours(const ChunkPosition& chunkPosition) const;
 
   private:
     std::unordered_map<ChunkPosition, Chunk, ChunkPositionHash> m_chunks;

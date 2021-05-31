@@ -151,24 +151,22 @@ namespace {
 
 } // namespace
 
-std::vector<ChunkPosition> createChunkTerrains(ChunkMap& chunkmap, int worldSize)
+std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize)
 {
     std::vector<ChunkPosition> positions;
     int seed = 26346;
-    for (int x = 0; x < worldSize; x++) {
-        for (int z = 0; z < worldSize; z++) {
-            ChunkPosition position{x, 0, z};
+    ChunkPosition position{chunkX, 0, chunkZ};
 
-            auto heightMap = createChunkHeightMap(position, worldSize, seed);
-            auto biomeMap = createBiomeMap(position, 9876);
-            int maxHeight = *std::max_element(heightMap.cbegin(), heightMap.cend());
-            for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
-                Chunk& chunk = chunkmap.addChunk({x, y, z});
-                createTerrain(chunk, heightMap, biomeMap);
-                chunkmap.ensureNeighbours(chunk.position());
-                positions.push_back({x, y, z});
-            }
-        }
+    auto heightMap = createChunkHeightMap(position, worldSize, seed);
+    auto biomeMap = createBiomeMap(position, 9876);
+    int maxHeight = *std::max_element(heightMap.cbegin(), heightMap.cend());
+    for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
+        Chunk& chunk = chunkmap.addChunk({chunkX, y, chunkZ});
+        createTerrain(chunk, heightMap, biomeMap);
+     //   chunkmap.ensureNeighbours(chunk.position());
+        positions.push_back({chunkX, y, chunkZ});
+        chunk.hasTerrain = true;
     }
+
     return positions;
 }

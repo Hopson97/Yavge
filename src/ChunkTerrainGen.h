@@ -3,4 +3,4 @@
 #include "Chunk.h"
 #include "Graphics/Mesh.h"
 
-std::vector<ChunkPosition> createChunkTerrains(ChunkMap& chunkmap, int worldSize);
+std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize);

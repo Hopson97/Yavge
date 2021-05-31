@@ -152,3 +152,12 @@ void ChunkMap::ensureNeighbours(const ChunkPosition& chunkPosition)
     addChunk({cp.x, cp.y, cp.z - 1});
     addChunk({cp.x, cp.y, cp.z + 1});
 }
+
+bool ChunkMap::hasNeighbours(const ChunkPosition& chunkPosition) const
+{
+    const auto& cp = chunkPosition;
+
+    return getChunk({cp.x, cp.y + 1, cp.z}).hasTerrain && getChunk({cp.x, cp.y - 1, cp.z}).hasTerrain &&
+           getChunk({cp.x - 1, cp.y, cp.z}).hasTerrain && getChunk({cp.x + 1, cp.y, cp.z}).hasTerrain &&
+           getChunk({cp.x, cp.y, cp.z - 1}).hasTerrain && getChunk({cp.x, cp.y, cp.z + 1}).hasTerrain;
+}
