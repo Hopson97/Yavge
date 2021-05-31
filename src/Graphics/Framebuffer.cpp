@@ -4,11 +4,16 @@
 #include "Texture.h"
 #include <stdio.h>
 
-Framebuffer::Framebuffer(GLuint width, GLuint height)
-    : m_width(width)
-    , m_height(height)
+Framebuffer::Framebuffer()
+
 {
     glCreateFramebuffers(1, &m_fbo);
+}
+
+void Framebuffer::create(GLuint width, GLuint height)
+{
+    m_width = width;
+    m_height = height;
 }
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept

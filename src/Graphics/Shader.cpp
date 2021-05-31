@@ -67,7 +67,7 @@ Shader::~Shader()
     }
 }
 
-Shader::Shader(const char* vertexFilename, const char* fragmentFileName)
+void Shader::loadFromFile(const char* vertexFilename, const char* fragmentFileName)
 {
 
     char vertfullFileName[128] = "Data/Shaders/";

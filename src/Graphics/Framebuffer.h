@@ -6,13 +6,9 @@
 
 class Framebuffer final {
   public:
-    Framebuffer(GLuint width, GLuint height);
-    Framebuffer& operator=(Framebuffer&& other) noexcept;
-    Framebuffer(Framebuffer&& other) noexcept;
-    ~Framebuffer();
+    Framebuffer();
 
-    Framebuffer& operator=(Framebuffer& other) = delete;
-    Framebuffer(Framebuffer& other) = delete;
+    void create(GLuint width, GLuint height);
 
     const Texture2D* addTexture();
     void finish();
@@ -27,4 +23,12 @@ class Framebuffer final {
     GLuint m_height = 0;
     GLuint m_rbo = 0;
     GLuint m_fbo = 0;
+
+  public:
+    Framebuffer& operator=(Framebuffer&& other) noexcept;
+    Framebuffer(Framebuffer&& other) noexcept;
+    ~Framebuffer();
+
+    Framebuffer& operator=(Framebuffer& other) = delete;
+    Framebuffer(Framebuffer& other) = delete;
 };
