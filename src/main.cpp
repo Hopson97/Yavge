@@ -3,6 +3,7 @@
 #include "Graphics/GLWrappers.h"
 #include "Maths.h"
 #include "Utility.h"
+#include "Voxels.h"
 
 #include "ChunkMesh.h"
 #include "ChunkTerrainGen.h"
@@ -64,30 +65,36 @@ int main()
     Shader screenShader("ScreenVertex.glsl", "ScreenFragment.glsl");
     Shader voxelShader("VoxelVertex.glsl", "VoxelFragment.glsl");
 
+    // Screen VAO is the final render target renderable thing
     VertexArray screen;
+
+    // A square
     VertexArray quad;
     quad.bufferMesh(createQuadMesh());
 
+    // Normal terrain
     VertexArray terrain;
     terrain.bufferMesh(createTerrainMesh());
 
+    // A cube to represent the light
     VertexArray lightCube;
     lightCube.bufferMesh(createCubeMesh({2.5f, 2.5f, 2.5f}));
 
+    // a cute cube
     VertexArray grassCube;
     grassCube.bufferMesh(createGrassCubeMesh());
 
+    // Normal texture
     Texture2D texture;
     texture.loadTexture("opengl_logo.png");
 
+    // Init the block system, which also populates this texture array
     TextureArray2D textureArray;
     textureArray.create(16, 16);
-    textureArray.addTexture("grass_side.png");
-    textureArray.addTexture("dirt.png");
-    textureArray.addTexture("grass.png");
+    initVoxelSystem(textureArray);
 
     ChunkMap chunkMap;
-    constexpr int worldSize = 32;
+    constexpr int worldSize = 20;
     auto pos = createChunkTerrains(chunkMap, worldSize);
 
     std::vector<VertexArray> chunkVertexArrays;

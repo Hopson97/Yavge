@@ -1,5 +1,6 @@
 #include "ChunkMesh.h"
 
+#include "Voxels.h"
 namespace {
     using v3 = glm::ivec3;
     using v2 = glm::vec2;
@@ -55,36 +56,36 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
                 auto voxel = chunk.qGetVoxel(voxelPosition);
                 if (voxel > 0) {
 
-                    // auto& voxData = voxelData.getVoxelData(voxel);
+                    auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
                     // Left voxel face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x - 1, y, z}))) {
-                        mesh.addVoxelFace(LEFT_FACE, p, voxelPosition, 1);
+                        mesh.addVoxelFace(LEFT_FACE, p, voxelPosition, voxData.textureSide);
                     }
 
                     // Right chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x + 1, y, z}))) {
-                        mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition, 1);
+                        mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition, voxData.textureSide);
                     }
 
                     // Front chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y, z + 1}))) {
-                        mesh.addVoxelFace(FRONT_FACE, p, voxelPosition, 1);
+                        mesh.addVoxelFace(FRONT_FACE, p, voxelPosition, voxData.textureSide);
                     }
 
                     // Back chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y, z - 1}))) {
-                        mesh.addVoxelFace(BACK_FACE, p, voxelPosition, 1);
+                        mesh.addVoxelFace(BACK_FACE, p, voxelPosition, voxData.textureSide);
                     }
 
                     // Bottom chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y - 1, z}))) {
-                        mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition, 0);
+                        mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition, voxData.textureBottom);
                     }
 
                     // Top chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y + 1, z}))) {
-                        mesh.addVoxelFace(TOP_FACE, p, voxelPosition, 2);
+                        mesh.addVoxelFace(TOP_FACE, p, voxelPosition, voxData.textureTop);
                     }
                 }
             }

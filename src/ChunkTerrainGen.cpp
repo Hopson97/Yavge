@@ -1,5 +1,6 @@
 #include "ChunkTerrainGen.h"
 
+#include "Voxels.h"
 #include <algorithm>
 #include <cstring>
 #include <functional>
@@ -52,11 +53,11 @@ namespace {
         const float WOLRD_SIZE = static_cast<float>(worldSize) * CHUNK_SIZE;
 
         NoiseOptions firstNoise;
-        firstNoise.amplitude = 105;
-        firstNoise.octaves = 6;
-        firstNoise.smoothness = 205.f;
+        firstNoise.amplitude = 230;
+        firstNoise.octaves = 8;
+        firstNoise.smoothness = 500.f;
         firstNoise.roughness = 0.58f;
-        firstNoise.offset = 18;
+        firstNoise.offset = 0;
 
         NoiseOptions secondNoise;
         secondNoise.amplitude = 20;
@@ -118,26 +119,26 @@ namespace {
                 // int biomeVal = biomeMap[z * CHUNK_SIZE + x];
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     int voxelY = chunk.position().y * CHUNK_SIZE + y;
-                    VoxelID voxel = 0;
+                    VoxelID voxel = VoxelType::AIR;
 
                     if (voxelY > height) {
                         if (voxelY < WATER_LEVEL) {
-                            voxel = 0; //TODO Water
+                            voxel = VoxelType::WATER;
                         }
                     }
                     else if (voxelY == height) {
                         if (voxelY < WATER_LEVEL + 3) {
-                            voxel = 2;
+                            voxel = VoxelType::SAND;
                         }
                         else {
-                            chunk.qSetVoxel({x, y, z}, 3);
+                            voxel = VoxelType::GRASS;
                         }
                     }
                     else if (voxelY > height - 3) {
-                        voxel = 4;
+                        voxel = VoxelType::DIRT;
                     }
                     else {
-                        voxel = 5;
+                        voxel = VoxelType::STONE;
                     }
 
                     if (voxel > 0) {
@@ -161,7 +162,7 @@ std::vector<ChunkPosition> createChunkTerrains(ChunkMap& chunkmap, int worldSize
             auto heightMap = createChunkHeightMap(position, worldSize, seed);
             auto biomeMap = createBiomeMap(position, 9876);
             int maxHeight = *std::max_element(heightMap.cbegin(), heightMap.cend());
-            for (int y = 0; y < std::max(1, maxHeight / CHUNK_SIZE + 1); y++) {
+            for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
                 Chunk& chunk = chunkmap.addChunk({x, y, z});
                 createTerrain(chunk, heightMap, biomeMap);
                 chunkmap.ensureNeighbours(chunk.position());
