@@ -16,6 +16,7 @@ class Texture2D final {
 
     void loadTexture(const char* file);
     void createFramebufferTexture(GLint width, GLint height);
+    void createFramebufferDepth(GLint width, GLint height);
 
   private:
     GLuint m_handle = 0;

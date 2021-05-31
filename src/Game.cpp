@@ -163,12 +163,10 @@ void Game::onRender()
     for (auto& chunk : m_chunkRenderList) {
         chunk.drawElements();
     }
-    glEnable(GL_BLEND);
 
     for (auto& chunk : m_transparentChunkRenderList) {
         chunk.drawElements();
     }
-    glDisable(GL_BLEND);
 }
 
 void Game::onGUI()

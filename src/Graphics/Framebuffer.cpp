@@ -53,11 +53,20 @@ Framebuffer::~Framebuffer()
 
 const Texture2D* Framebuffer::addTexture()
 {
-    auto& t = m_attachments.emplace_back();
+    Texture2D& t = m_attachments.emplace_back();
     t.createFramebufferTexture(WIDTH, HEIGHT);
     glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, t.m_handle, 0);
     return &t;
 }
+
+const Texture2D* Framebuffer::addDepthTexture()
+{
+    Texture2D& t = m_attachments.emplace_back();
+    t.createFramebufferDepth(WIDTH, HEIGHT);
+    glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, t.m_handle, 0);
+    return &t;
+}
+
 
 void Framebuffer::finish()
 {

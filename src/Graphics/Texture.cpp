@@ -50,9 +50,23 @@ void Texture2D::loadTexture(const char* file)
 void Texture2D::createFramebufferTexture(GLint width, GLint height)
 {
     glTextureStorage2D(m_handle, 1, GL_RGB8, width, height);
+    
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
+
+void Texture2D::createFramebufferDepth(GLint width, GLint height)
+{
+    glTextureStorage2D(m_handle, 1, GL_DEPTH_COMPONENT24, width, height);
+
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
+
 
 void Texture2D::bind() const
 {
