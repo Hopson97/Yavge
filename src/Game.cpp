@@ -1,7 +1,6 @@
 #include "Game.h"
 
 #include "ChunkTerrainGen.h"
-#include "GUI.h"
 #include "Utility.h"
 #include "Voxels.h"
 
@@ -14,13 +13,13 @@ Game::Game()
     m_voxelShader   .loadFromFile("VoxelVertex.glsl",   "VoxelFragment.glsl");
     m_waterShader   .loadFromFile("WaterVertex.glsl",   "WaterFragment.glsl");
   
-    m_quad      .bufferMesh(createQuadMesh());
     m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
     m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
-    m_grassCube .bufferMesh(createGrassCubeMesh());
 
     m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE, true));
     
+    m_framebufferTest.create(256, 256);
+    m_fboTestTexture = m_framebufferTest.addTexture();
 
     m_texture.loadTexture("opengl_logo.png");
     m_waterTexture.loadTexture("water.png");
@@ -93,17 +92,37 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 void Game::onUpdate()
 {
     m_sun.update(m_timer.getElapsedTime().asMilliseconds());
+    std::unique_lock<std::mutex> l(m_chunkVectorLock);
+    while (!m_chunkMeshQueue.empty()) {
+
+        ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
+        m_chunkMeshQueue.pop();
+        if (mesh.indicesCount > 0) {
+
+            VertexArray chunkVertexArray;
+            chunkVertexArray.bufferMesh(mesh);
+            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
+
+            m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+        }
+    }
 }
 
 void Game::onRender()
 {
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CLIP_DISTANCE0);
     auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
 
+    m_framebufferTest.bind();
     renderScene(projectionViewMatrix);
     renderTerrain(projectionViewMatrix);
+
+    m_framebufferTest.unbind();
+
     renderWater(projectionViewMatrix);
+    renderScene(projectionViewMatrix);
+    renderTerrain(projectionViewMatrix);
 
     // Render the chunk
 }
@@ -112,10 +131,13 @@ void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform);
     // gameDebugScreen(m_sun);
+
+    m_guiTexture.render(m_waterTexture, 800, 800, 200, 200);
 }
 
 void Game::renderScene(const glm::mat4& projectionViewMatrix)
 {
+    glDisable(GL_CULL_FACE);
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
     m_sceneShader.set("isLight", false);
@@ -124,11 +146,6 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
     m_texture.bind();
-
-    auto modelMatrix = createModelMatrix(m_quadTransform);
-    m_sceneShader.set("modelMatrix", modelMatrix);
-
-    m_quad.getRendable().drawElements();
 
     glm::mat4 terrainModel{1.0f};
     terrainModel = glm::translate(terrainModel, {-30, CHUNK_SIZE * 3, -40});
@@ -144,38 +161,18 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
 
 void Game::renderTerrain(const glm::mat4& projectionViewMatrix)
 {
+    glEnable(GL_CULL_FACE);
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_voxelShader.set("lightPosition", m_sun.t.position);
     m_voxelShader.set("eyePosition", m_cameraTransform.position);
-
+    m_voxelShader.set("clippingPlane", glm::vec4{0, -1, 0, WATER_LEVEL - 0.1f});
     m_textureArray.bind();
 
     glm::mat4 voxelModel{1.0f};
     voxelModel = glm::translate(voxelModel, {0, 0, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
-    m_grassCube.getRendable().drawElements();
-
-    voxelModel = glm::translate(voxelModel, {0, 0, 0});
-    m_voxelShader.set("modelMatrix", voxelModel);
-
-    {
-        std::unique_lock<std::mutex> l(m_chunkVectorLock);
-        while (!m_chunkMeshQueue.empty()) {
-
-            ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
-            m_chunkMeshQueue.pop();
-            if (mesh.indicesCount > 0) {
-
-                VertexArray chunkVertexArray;
-                chunkVertexArray.bufferMesh(mesh);
-                m_chunkRenderList.push_back(chunkVertexArray.getRendable());
-
-                m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
-            }
-        }
-    }
 
     for (auto& chunk : m_chunkRenderList) {
         chunk.drawElements();
@@ -184,6 +181,7 @@ void Game::renderTerrain(const glm::mat4& projectionViewMatrix)
 
 void Game::renderWater(const glm::mat4& projectionViewMatrix)
 {
+    glDisable(GL_CULL_FACE);
     m_waterShader.bind();
     m_waterShader.set("projectionViewMatrix", projectionViewMatrix);
     m_waterShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
@@ -191,17 +189,19 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("eyePosition", m_cameraTransform.position);
 
     glm::mat4 waterModel{1.0f};
+    // m_fboTestTexture->bind();
     m_waterTexture.bind();
     waterModel = glm::translate(waterModel, {0, WATER_LEVEL - 0.1, 0});
     m_waterShader.set("modelMatrix", waterModel);
     m_waterQuad.getRendable().drawElements();
-
 }
 
 void Game::runTerrainThread()
 {
     // Cool seeds:
     // 12993 -> 3 islands with a harboury area between
+    // 18087 -> Ridge mountins
+    // 2914 -> lots of lil island
     std::srand(std::time(0));
     int seed = std::rand() % 30000;
     while (m_isRunning) {

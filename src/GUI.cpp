@@ -1,9 +1,9 @@
 #include "GUI.h"
 
+#include "Maths.h"
+#include "Utility.h"
 #include <nuklear/nuklear_def.h>
 #include <nuklear/nuklear_sfml_gl3.h>
-
-#include "Maths.h"
 
 #define MAX_VERTEX_MEMORY 0x80000
 #define MAX_ELEMENT_MEMORY 0x80000
@@ -88,33 +88,28 @@ void guiDebugScreen(const Transform& transform)
     nk_end(ctx);
 }
 
-void gameDebugScreen(Sun& sun)
+SpriteRenderer::SpriteRenderer()
 {
-    const Transform transform = sun.t;
-    if (nk_begin(ctx, "Sun Control Window", nk_rect(800, 10, 400, 200), window_flags)) {
-        nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Sun Position: (%f %f %f)", transform.position[0], transform.position[1],
-                  transform.position[2]);
+    glm::mat4 orthoMatrix{1.0f};
+    orthoMatrix = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
+    m_guiShader.loadFromFile("GUIVertex.glsl", "GUIFragment.glsl");
+    
+    m_guiShader.bind();
+    m_guiShader.set("orthographicMatrix", orthoMatrix);
+    m_guiShader.set("guiTexture", 0);
+}
 
-        nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Sun Rotation: (%f %f %f)", transform.rotation[0], transform.rotation[1],
-                  transform.rotation[2]);
+void SpriteRenderer::render(Texture2D& texture, float x, float y, float width, float height)
+{
+    glDisable(GL_CULL_FACE);
+    texture.bind();
+    m_guiShader.bind();
 
-        nk_layout_row_dynamic(ctx, 30, 3);
-        {
-            nk_label(ctx, "Orbit Radius:", NK_TEXT_LEFT);
-            nk_slider_int(ctx, 0, &sun.orbitRadius, CHUNK_SIZE * CHUNK_SIZE, 10);
-            nk_labelf(ctx, NK_STATIC, "%d", sun.orbitRadius);
-        }
+    glm::mat4 modelMatrix{1.0f};
+    modelMatrix = glm::translate(modelMatrix, {x, y, 0});
+    modelMatrix = glm::scale(modelMatrix, {width, height, 1.0});
+    m_guiShader.set("transform", modelMatrix);
 
-        nk_layout_row_dynamic(ctx, 30, 3);
-        {
-            nk_label(ctx, "Orbit Speed:", NK_TEXT_LEFT);
-            nk_slider_int(ctx, 0, &sun.orbitSpeed, 25000, 100);
-            nk_labelf(ctx, NK_STATIC, "%d", sun.orbitSpeed);
-        }
 
-        nk_layout_row_dynamic(ctx, 25, 2);
-    }
-    nk_end(ctx);
+    m_guiQuad.getRendable().drawArrays(6);
 }

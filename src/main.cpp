@@ -18,14 +18,14 @@ int main()
     glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
 
     // Final render target
-    VertexArray screen;
-    Shader screenShader;
-    Framebuffer framebuffer;
+    // VertexArray screen;
+    // Shader screenShader;
+    // Framebuffer framebuffer;
 
-    screenShader.loadFromFile("ScreenVertex.glsl", "ScreenFragment.glsl");
-    framebuffer.create(WIDTH, HEIGHT);
-    const Texture2D* colour = framebuffer.addTexture();
-    framebuffer.finish();
+    // screenShader.loadFromFile("ScreenVertex.glsl", "ScreenFragment.glsl");
+    // framebuffer.create(WIDTH, HEIGHT);
+    // const Texture2D* colour = framebuffer.addTexture();
+    // framebuffer.finish();
 
     // The game/ system itself
     Game game;
@@ -54,16 +54,17 @@ int main()
 
         //
         glEnable(GL_DEPTH_TEST);
-        framebuffer.bind();
+        //   framebuffer.bind();
 
         // Render the regular scene
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         game.onRender();
 
         // Render the frame buffer content to the window
-        Framebuffer::unbind();
-        screenShader.bind();
-        colour->bind();
-        screen.getRendable().drawArrays(6);
+        // Framebuffer::unbind();
+        // screenShader.bind();
+        //  colour->bind();
+        //  screen.getRendable().drawArrays(6);
 
         game.onGUI();
         guiEndFrame();

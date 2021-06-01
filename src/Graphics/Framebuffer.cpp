@@ -69,7 +69,6 @@ const Texture2D* Framebuffer::addDepthTexture()
     glNamedFramebufferDrawBuffer(m_fbo, GL_NONE);
     glNamedFramebufferReadBuffer(m_fbo, GL_NONE);
 
-
     glReadBuffer(GL_NONE);
     return &t;
 }

@@ -1,18 +1,17 @@
 #pragma once
 
 #include "Chunk.h"
+#include "GUI.h"
 #include "Graphics/GLWrappers.h"
 #include "Maths.h"
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Window.hpp>
-#include <queue>
-#include <vector>
-
 #include <atomic>
-#include <condition_variable>
 #include <iostream>
 #include <mutex>
+#include <queue>
 #include <thread>
+#include <vector>
 
 class Keyboard;
 
@@ -53,26 +52,14 @@ class Game {
     Shader m_voxelShader;
     Shader m_waterShader;
 
-    VertexArray m_quad;
     VertexArray m_terrain;
     VertexArray m_lightCube;
-    VertexArray m_grassCube;
-
 
     Texture2D m_texture;
     TextureArray2D m_textureArray;
-    const Texture2D* m_frambufferTexture = nullptr;
 
-    ChunkMap m_chunkMap;
-
-    std::queue<ChunkMesh> m_chunkMeshQueue;
-    std::queue<ChunkPosition> m_chunkReadyForMeshingQueue;
-    std::queue<ChunkPosition> m_chunkUpdateQueue;
-
-    std::vector<VertexArray> m_chunkVertexArrays;
-    std::vector<Renderable> m_chunkRenderList;
-    VertexArray m_waterQuad;
-    Texture2D m_waterTexture;
+    Framebuffer m_framebufferTest;
+    const Texture2D* m_fboTestTexture = nullptr;
 
     Sun m_sun;
     Transform m_cameraTransform;
@@ -82,8 +69,21 @@ class Game {
 
     sf::Clock m_timer;
 
+    // Chunk render stuff
+
+    std::vector<VertexArray> m_chunkVertexArrays;
+    std::vector<Renderable> m_chunkRenderList;
+    VertexArray m_waterQuad;
+    Texture2D m_waterTexture;
+
+    ChunkMap m_chunkMap;
+    std::queue<ChunkMesh> m_chunkMeshQueue;
+    std::queue<ChunkPosition> m_chunkReadyForMeshingQueue;
+    std::queue<ChunkPosition> m_chunkUpdateQueue;
     std::mutex m_chunkVectorLock;
     std::mutex m_chunkUpdateLock;
     std::thread m_chunkMeshGenThread;
     std::atomic_bool m_isRunning{true};
+
+    SpriteRenderer m_guiTexture;
 };

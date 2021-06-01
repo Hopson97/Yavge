@@ -8,10 +8,10 @@ Mesh createQuadMesh()
     // clang-format off
     Mesh mesh;
     mesh.vertices = {
-        {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-        {{ 0.5f, -0.5f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-        {{ 0.5f,  0.5f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}
     };
     // clang-format on
     mesh.indices = {0, 1, 2, 2, 3, 0};
@@ -126,16 +126,16 @@ Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat)
     bumpNoise.offset = 0;
 
     std::vector<float> heights(heightMapWidth * heightMapWidth);
-    if (!isFlat){
-    for (int z = 0; z < heightMapWidth; z++) {
-        for (int x = 0; x < heightMapWidth; x++) {
-            int tx = x + (heightMapWidth - 1);
-            int tz = z + (heightMapWidth - 1);
-            float height = getNoiseAt({tx, tz}, 123, terrainNoise);
-            float bumps = getNoiseAt({tx, tz}, 123, bumpNoise);
-            heights[z * heightMapWidth + x] = height + bumps;
+    if (!isFlat) {
+        for (int z = 0; z < heightMapWidth; z++) {
+            for (int x = 0; x < heightMapWidth; x++) {
+                int tx = x + (heightMapWidth - 1);
+                int tz = z + (heightMapWidth - 1);
+                float height = getNoiseAt({tx, tz}, 123, terrainNoise);
+                float bumps = getNoiseAt({tx, tz}, 123, bumpNoise);
+                heights[z * heightMapWidth + x] = height + bumps;
+            }
         }
-    }
     }
 
     auto getHeight = [&](int x, int y) {
