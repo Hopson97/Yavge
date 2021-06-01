@@ -42,8 +42,7 @@ class Game {
     void onGUI();
 
   private:
-    void renderScene(const glm::mat4& projectionViewMatrix);
-    void renderTerrain(const glm::mat4& projectionViewMatrix);
+    void renderScene(const glm::mat4& projectionViewMatrix, const glm::vec4 clipPlane);
     void renderWater(const glm::mat4& projectionViewMatrix);
 
     void runTerrainThread();

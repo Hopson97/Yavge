@@ -27,7 +27,7 @@ Texture2D::~Texture2D()
     glDeleteTextures(1, &m_handle);
 }
 
-void Texture2D::loadTexture(const char* file)
+void Texture2D::loadFromFile(const char* file)
 {
     char texturePath[128] = "Data/Textures/";
     std::strcat(texturePath, file);
@@ -67,9 +67,9 @@ void Texture2D::createFramebufferDepth(GLint width, GLint height)
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-void Texture2D::bind() const
+void Texture2D::bind(GLenum unit) const
 {
-    glBindTextureUnit(0, m_handle);
+    glBindTextureUnit(unit, m_handle);
 }
 
 TextureArray2D::TextureArray2D()

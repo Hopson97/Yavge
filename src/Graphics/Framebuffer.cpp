@@ -73,12 +73,16 @@ const Texture2D* Framebuffer::addDepthTexture()
     return &t;
 }
 
+void Framebuffer::addRenderBuffer()
+{
+   // glCreateRenderbuffers(1, &m_rbo);
+   // glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
+   // glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+
+}
+
 void Framebuffer::finish()
 {
-    glCreateRenderbuffers(1, &m_rbo);
-    glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
-    glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
-
     if (glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         setTextColourRGB(255, 0, 0);
         fprintf(stderr, "Failed to create framebuffer.");

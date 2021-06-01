@@ -2,19 +2,16 @@
 
 #include <glad/glad.h>
 
-GLuint loadTexture(const char* file);
+GLuint loadFromFile(const char* file);
 GLuint createFramebufferTexture(GLint width, GLint height);
 
 class Texture2D final {
   public:
     Texture2D();
+    
+    void bind(GLenum unit) const;
 
-    void create(unsigned width, unsigned height);
-    void create(const char* name, bool flip);
-
-    void bind() const;
-
-    void loadTexture(const char* file);
+    void loadFromFile(const char* file);
     void createFramebufferTexture(GLint width, GLint height);
     void createFramebufferDepth(GLint width, GLint height);
 

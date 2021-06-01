@@ -12,6 +12,7 @@ class Framebuffer final {
 
     const Texture2D* addTexture();
     const Texture2D* addDepthTexture();
+    void addRenderBuffer();
     void finish();
 
     void bind() const;
