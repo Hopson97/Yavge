@@ -93,16 +93,19 @@ SpriteRenderer::SpriteRenderer()
     glm::mat4 orthoMatrix{1.0f};
     orthoMatrix = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
     m_guiShader.loadFromFile("GUIVertex.glsl", "GUIFragment.glsl");
+    m_guiBorder.loadFromFile("GUIBorder.png");
     
     m_guiShader.bind();
     m_guiShader.set("orthographicMatrix", orthoMatrix);
     m_guiShader.set("guiTexture", 0);
+    m_guiShader.set("borderTexture", 1);
 }
 
-void SpriteRenderer::render(Texture2D& texture, float x, float y, float width, float height)
+void SpriteRenderer::render(const Texture2D& texture, float x, float y, float width, float height)
 {
-    glDisable(GL_CULL_FACE);
-    texture.bind();
+   // glEnable(GL_BLEND);
+    texture.bind(0);
+    m_guiBorder.bind(1);
     m_guiShader.bind();
 
     glm::mat4 modelMatrix{1.0f};
@@ -112,4 +115,5 @@ void SpriteRenderer::render(Texture2D& texture, float x, float y, float width, f
 
 
     m_guiQuad.getRendable().drawArrays(6);
+    //glDisable(GL_BLEND);
 }

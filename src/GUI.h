@@ -21,9 +21,10 @@ void guiDebugScreen(const Transform& transform);
 struct SpriteRenderer {
   public:
     SpriteRenderer();
-    void render(Texture2D& texture, float x, float y, float width, float height);
+    void render(const Texture2D& texture, float x, float y, float width, float height);
 
   private:
     VertexArray m_guiQuad;
     Shader m_guiShader;
+    Texture2D m_guiBorder;
 };
