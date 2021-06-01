@@ -49,9 +49,9 @@ void ChunkMesh::addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chu
     indicesCount += 4;
 }
 
-ChunkMeshes createChunkMeshes(const Chunk& chunk)
+ChunkMesh createChunkMesh(const Chunk& chunk)
 {
-    ChunkMeshes meshes;
+    ChunkMesh mesh;
     auto p = chunk.position();
 
     for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -60,11 +60,7 @@ ChunkMeshes createChunkMeshes(const Chunk& chunk)
                 // If it is "not air"
                 VoxelPosition voxelPosition(x, y, z);
                 auto voxel = chunk.qGetVoxel(voxelPosition);
-                if (voxel > 0) {
-
-                    ChunkMesh& mesh =
-                        getVoxelType((VoxelType)voxel).isTransparent ? meshes.transparentChunk : meshes.solidChunk;
-
+                if (voxel > VoxelType::WATER) {
                     auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
                     // Left voxel face
@@ -101,7 +97,7 @@ ChunkMeshes createChunkMeshes(const Chunk& chunk)
         }
     }
 
-    return meshes;
+    return mesh;
 }
 
 ChunkMesh createGrassCubeMesh()

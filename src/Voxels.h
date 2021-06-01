@@ -6,10 +6,10 @@ class TextureArray2D;
 
 enum VoxelType : uint16_t {
     AIR = 0,
-    GRASS = 1,
-    DIRT = 2,
-    STONE = 3,
-    WATER = 4,
+    WATER = 1,
+    GRASS = 2,
+    DIRT = 3,
+    STONE = 4,
     SAND = 5,
 
     NUM_VOXELS

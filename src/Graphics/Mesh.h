@@ -21,4 +21,4 @@ struct Mesh {
 
 Mesh createQuadMesh();
 Mesh createCubeMesh(const glm::vec3& dimensions);
-Mesh createTerrainMesh();
+Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat);

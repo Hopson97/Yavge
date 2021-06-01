@@ -43,15 +43,21 @@ class Game {
     void onGUI();
 
   private:
+    void renderScene(const glm::mat4& projectionViewMatrix);
+    void renderTerrain(const glm::mat4& projectionViewMatrix);
+    void renderWater(const glm::mat4& projectionViewMatrix);
+
     void runTerrainThread();
 
     Shader m_sceneShader;
     Shader m_voxelShader;
+    Shader m_waterShader;
 
     VertexArray m_quad;
     VertexArray m_terrain;
     VertexArray m_lightCube;
     VertexArray m_grassCube;
+
 
     Texture2D m_texture;
     TextureArray2D m_textureArray;
@@ -59,13 +65,14 @@ class Game {
 
     ChunkMap m_chunkMap;
 
-    std::queue<ChunkMeshes> m_chunkMeshQueue;
+    std::queue<ChunkMesh> m_chunkMeshQueue;
     std::queue<ChunkPosition> m_chunkReadyForMeshingQueue;
     std::queue<ChunkPosition> m_chunkUpdateQueue;
 
     std::vector<VertexArray> m_chunkVertexArrays;
     std::vector<Renderable> m_chunkRenderList;
-    std::vector<Renderable> m_transparentChunkRenderList;
+    VertexArray m_waterQuad;
+    Texture2D m_waterTexture;
 
     Sun m_sun;
     Transform m_cameraTransform;

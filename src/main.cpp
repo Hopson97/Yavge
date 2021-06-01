@@ -24,7 +24,7 @@ int main()
 
     screenShader.loadFromFile("ScreenVertex.glsl", "ScreenFragment.glsl");
     framebuffer.create(WIDTH, HEIGHT);
-    const Texture2D* colour = framebuffer.addDepthTexture();
+    const Texture2D* colour = framebuffer.addTexture();
     framebuffer.finish();
 
     // The game/ system itself

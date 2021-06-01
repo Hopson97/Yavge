@@ -67,7 +67,6 @@ const Texture2D* Framebuffer::addDepthTexture()
     return &t;
 }
 
-
 void Framebuffer::finish()
 {
     glCreateRenderbuffers(1, &m_rbo);

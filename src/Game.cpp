@@ -12,13 +12,18 @@ Game::Game()
     // clang-format off
     m_sceneShader   .loadFromFile("SceneVertex.glsl",   "SceneFragment.glsl");
     m_voxelShader   .loadFromFile("VoxelVertex.glsl",   "VoxelFragment.glsl");
+    m_waterShader   .loadFromFile("WaterVertex.glsl",   "WaterFragment.glsl");
   
     m_quad      .bufferMesh(createQuadMesh());
-    m_terrain   .bufferMesh(createTerrainMesh());
+    m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
     m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
     m_grassCube .bufferMesh(createGrassCubeMesh());
 
+    m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE, true));
+    
+
     m_texture.loadTexture("opengl_logo.png");
+    m_waterTexture.loadTexture("water.png");
     m_textureArray.create(16, 16);
     initVoxelSystem(m_textureArray);
 
@@ -69,8 +74,9 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
         camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
     }
 
-    if (!isMouseActive)
+    if (!isMouseActive) {
         return;
+    }
     static auto lastMousePosition = sf::Mouse::getPosition(window);
     auto change = sf::Mouse::getPosition(window) - lastMousePosition;
     camera.rotation.x -= static_cast<float>(change.y * 0.5);
@@ -94,6 +100,21 @@ void Game::onRender()
     auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
 
+    renderScene(projectionViewMatrix);
+    renderTerrain(projectionViewMatrix);
+    renderWater(projectionViewMatrix);
+
+    // Render the chunk
+}
+
+void Game::onGUI()
+{
+    guiDebugScreen(m_cameraTransform);
+    // gameDebugScreen(m_sun);
+}
+
+void Game::renderScene(const glm::mat4& projectionViewMatrix)
+{
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
     m_sceneShader.set("isLight", false);
@@ -118,8 +139,10 @@ void Game::onRender()
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);
     m_lightCube.getRendable().drawElements();
+}
 
-    // Render the chunk
+void Game::renderTerrain(const glm::mat4& projectionViewMatrix)
+{
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
@@ -140,43 +163,42 @@ void Game::onRender()
         std::unique_lock<std::mutex> l(m_chunkVectorLock);
         while (!m_chunkMeshQueue.empty()) {
 
-            ChunkMeshes mesh = std::move(m_chunkMeshQueue.front());
+            ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
             m_chunkMeshQueue.pop();
 
             VertexArray chunkVertexArray;
-            VertexArray transparentVertexArray;
-            if (mesh.solidChunk.indicesCount > 0) {
-                chunkVertexArray.bufferMesh(mesh.solidChunk);
-                m_chunkRenderList.push_back(chunkVertexArray.getRendable());
-            }
-            if (mesh.transparentChunk.indicesCount > 0) {
-
-                transparentVertexArray.bufferMesh(mesh.transparentChunk);
-                m_transparentChunkRenderList.push_back(transparentVertexArray.getRendable());
-            }
+            chunkVertexArray.bufferMesh(mesh);
+            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
 
             m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
-            m_chunkVertexArrays.push_back(std::move(transparentVertexArray));
         }
     }
 
     for (auto& chunk : m_chunkRenderList) {
         chunk.drawElements();
     }
-
-    for (auto& chunk : m_transparentChunkRenderList) {
-        chunk.drawElements();
-    }
 }
 
-void Game::onGUI()
+void Game::renderWater(const glm::mat4& projectionViewMatrix)
 {
-    guiDebugScreen(m_cameraTransform);
-    // gameDebugScreen(m_sun);
+    m_waterShader.bind();
+    m_waterShader.set("projectionViewMatrix", projectionViewMatrix);
+    m_waterShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+    m_waterShader.set("lightPosition", m_sun.t.position);
+    m_waterShader.set("eyePosition", m_cameraTransform.position);
+
+    glm::mat4 waterModel{1.0f};
+    m_waterTexture.bind();
+    waterModel = glm::translate(waterModel, {0, WATER_LEVEL - 0.1, 0});
+    m_waterShader.set("modelMatrix", waterModel);
+    m_waterQuad.getRendable().drawElements();
+
 }
 
 void Game::runTerrainThread()
 {
+    // Cool seeds:
+    // 12993 -> 3 islands with a harboury area between
     std::srand(std::time(0));
     int seed = std::rand() % 30000;
     while (m_isRunning) {
@@ -199,7 +221,7 @@ void Game::runTerrainThread()
                 std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
                 auto p = m_chunkReadyForMeshingQueue.front();
                 if (m_chunkMap.hasNeighbours(p)) {
-                    m_chunkMeshQueue.push(createChunkMeshes(m_chunkMap.getChunk(p)));
+                    m_chunkMeshQueue.push(createChunkMesh(m_chunkMap.getChunk(p)));
                     m_chunkReadyForMeshingQueue.pop();
                 }
             }

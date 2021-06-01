@@ -104,14 +104,13 @@ namespace {
         return value / acc * options.amplitude + options.offset;
     }
 
-    constexpr int SIZE = 128;
-    constexpr int EDGE_VERTEX_COUNT = 128;
-    constexpr int HEIGHT_MAP_WIDTH = EDGE_VERTEX_COUNT + 2;
-    constexpr int AREA = EDGE_VERTEX_COUNT * EDGE_VERTEX_COUNT;
-    constexpr GLfloat fEDGE_VERTEX_COUNT = GLfloat(EDGE_VERTEX_COUNT - 1);
 } // namespace
-Mesh createTerrainMesh()
+
+Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat)
 {
+    int heightMapWidth = edgeVertices + 2;
+    float fEdgeVertexCount = static_cast<float>(edgeVertices);
+
     NoiseOptions terrainNoise;
     terrainNoise.roughness = 0.7;
     terrainNoise.smoothness = 350.0f;
@@ -126,43 +125,45 @@ Mesh createTerrainMesh()
     bumpNoise.amplitude = 5.0f;
     bumpNoise.offset = 0;
 
-    std::vector<float> heights(HEIGHT_MAP_WIDTH * HEIGHT_MAP_WIDTH);
-    for (int z = 0; z < HEIGHT_MAP_WIDTH; z++) {
-        for (int x = 0; x < HEIGHT_MAP_WIDTH; x++) {
-            int tx = x + (HEIGHT_MAP_WIDTH - 1);
-            int tz = z + (HEIGHT_MAP_WIDTH - 1);
+    std::vector<float> heights(heightMapWidth * heightMapWidth);
+    if (!isFlat){
+    for (int z = 0; z < heightMapWidth; z++) {
+        for (int x = 0; x < heightMapWidth; x++) {
+            int tx = x + (heightMapWidth - 1);
+            int tz = z + (heightMapWidth - 1);
             float height = getNoiseAt({tx, tz}, 123, terrainNoise);
             float bumps = getNoiseAt({tx, tz}, 123, bumpNoise);
-            heights[z * HEIGHT_MAP_WIDTH + x] = height + bumps;
+            heights[z * heightMapWidth + x] = height + bumps;
         }
+    }
     }
 
     auto getHeight = [&](int x, int y) {
-        if (x < 0 || x >= HEIGHT_MAP_WIDTH || y < 0 || y >= HEIGHT_MAP_WIDTH) {
+        if (x < 0 || x >= heightMapWidth || y < 0 || y >= heightMapWidth) {
             return 0.0f;
         }
         else {
-            return heights[y * HEIGHT_MAP_WIDTH + x];
+            return heights[y * heightMapWidth + x];
         }
     };
 
     Mesh mesh;
-    for (int z = 0; z < EDGE_VERTEX_COUNT; z++) {
-        for (int x = 0; x < EDGE_VERTEX_COUNT; x++) {
+    for (int z = 0; z < edgeVertices; z++) {
+        for (int x = 0; x < edgeVertices; x++) {
             GLfloat fz = static_cast<GLfloat>(z);
             GLfloat fx = static_cast<GLfloat>(x);
 
             int hx = x + 1;
             int hz = z + 1;
-            float height = getHeight(hx, hz);
+            float height = isFlat ? 0 : getHeight(hx, hz);
 
             Vertex vertex;
-            vertex.position.x = fx / fEDGE_VERTEX_COUNT * SIZE;
+            vertex.position.x = fx / fEdgeVertexCount * size;
             vertex.position.y = height;
-            vertex.position.z = fz / fEDGE_VERTEX_COUNT * SIZE;
+            vertex.position.z = fz / fEdgeVertexCount * size;
 
-            vertex.textureCoord.s = fx / fEDGE_VERTEX_COUNT;
-            vertex.textureCoord.t = fz / fEDGE_VERTEX_COUNT;
+            vertex.textureCoord.s = fx / fEdgeVertexCount;
+            vertex.textureCoord.t = fz / fEdgeVertexCount;
 
             float h1 = getHeight(hx - 1, hz);
             float h2 = getHeight(hx + 1, hz);
@@ -174,11 +175,11 @@ Mesh createTerrainMesh()
         }
     }
 
-    for (int z = 0; z < EDGE_VERTEX_COUNT - 1; z++) {
-        for (int x = 0; x < EDGE_VERTEX_COUNT - 1; x++) {
-            int topLeft = (z * EDGE_VERTEX_COUNT) + x;
+    for (int z = 0; z < edgeVertices - 1; z++) {
+        for (int x = 0; x < edgeVertices - 1; x++) {
+            int topLeft = (z * edgeVertices) + x;
             int topRight = topLeft + 1;
-            int bottomLeft = ((z + 1) * EDGE_VERTEX_COUNT) + x;
+            int bottomLeft = ((z + 1) * edgeVertices) + x;
             int bottomRight = bottomLeft + 1;
 
             mesh.indices.push_back(topLeft);
