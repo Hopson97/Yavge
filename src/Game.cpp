@@ -27,7 +27,8 @@ Game::Game()
     m_textureArray.create(16, 16);
     initVoxelSystem(m_textureArray);
 
-    m_cameraTransform = { {0, CHUNK_SIZE * 5, 0}, {0, -90, 0} };
+    auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
+    m_cameraTransform = { {c, CHUNK_SIZE * 5, c}, {0, 0, 0} };
     m_sun.t.position.y = CHUNK_SIZE * 4;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
@@ -165,12 +166,14 @@ void Game::renderTerrain(const glm::mat4& projectionViewMatrix)
 
             ChunkMesh mesh = std::move(m_chunkMeshQueue.front());
             m_chunkMeshQueue.pop();
+            if (mesh.indicesCount > 0) {
 
-            VertexArray chunkVertexArray;
-            chunkVertexArray.bufferMesh(mesh);
-            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
+                VertexArray chunkVertexArray;
+                chunkVertexArray.bufferMesh(mesh);
+                m_chunkRenderList.push_back(chunkVertexArray.getRendable());
 
-            m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+                m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+            }
         }
     }
 
