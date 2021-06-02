@@ -125,7 +125,6 @@ void Game::onRender()
     // if reflection
     // to do
 
-
     renderWater(projectionViewMatrix);
     renderScene(projectionViewMatrix, {0, -1, 0, 100000000});
 

@@ -11,17 +11,11 @@ out vec2 passTextureCoord;
 out vec3 passNormal;
 out vec3 passFragPosition;
 
-const vec4 plane = vec4(0, -1, 0, 64);
 
 
 void main()
 {
-
-
     vec4 worldPos = modelMatrix * vec4(inVertexCoord, 1.0);
-    
-    gl_ClipDistance[0] = dot(worldPos, plane);
-    
     
     gl_Position = projectionViewMatrix * worldPos;
     passTextureCoord = inTexCoord;

@@ -75,10 +75,9 @@ const Texture2D* Framebuffer::addDepthTexture()
 
 void Framebuffer::addRenderBuffer()
 {
-   // glCreateRenderbuffers(1, &m_rbo);
-   // glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
-   // glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
-
+    // glCreateRenderbuffers(1, &m_rbo);
+    // glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
+    // glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 }
 
 void Framebuffer::finish()

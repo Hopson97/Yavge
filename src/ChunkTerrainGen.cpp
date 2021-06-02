@@ -82,8 +82,9 @@ namespace {
                 auto island = rounded(coord) * 1.25;
                 float result = noise * noise2;
 
-                heightMap[z * CHUNK_SIZE + x] =
-                    static_cast<int>((result * firstNoise.amplitude + firstNoise.offset) * island) - 5;
+                float r = static_cast<int>((result * firstNoise.amplitude + firstNoise.offset) * island) - 5;
+                //if (r < WATER_LEVEL) r = WATER_LEVEL - r;
+                heightMap[z * CHUNK_SIZE + x] =r;
             }
         }
 

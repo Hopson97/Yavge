@@ -8,7 +8,7 @@ GLuint createFramebufferTexture(GLint width, GLint height);
 class Texture2D final {
   public:
     Texture2D();
-    
+
     void bind(GLenum unit) const;
 
     void loadFromFile(const char* file);
