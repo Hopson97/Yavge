@@ -54,7 +54,7 @@ Framebuffer::~Framebuffer()
 const Texture2D* Framebuffer::addTexture()
 {
     Texture2D& t = m_attachments.emplace_back();
-    t.createFramebufferTexture(WIDTH, HEIGHT);
+    t.createFramebufferTexture(m_width, m_height);
     glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, t.m_handle, 0);
     return &t;
 }
@@ -82,9 +82,9 @@ void Framebuffer::addRenderBuffer()
 
 void Framebuffer::finish()
 {
-    if (glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    if (auto status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         setTextColourRGB(255, 0, 0);
-        fprintf(stderr, "Failed to create framebuffer.");
+        fprintf(stderr, "Failed to create framebuffer. %d\n", status);
         setTextColourRGB(255, 255, 255);
         fflush(stderr);
     }
@@ -93,11 +93,11 @@ void Framebuffer::finish()
 void Framebuffer::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, m_width, m_height);
 }
 
 void Framebuffer::unbind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, WIDTH, HEIGHT);
 }
