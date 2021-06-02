@@ -33,21 +33,20 @@ void main()
 
 
 
-   // outColour = texture(diffuseTexture, passTextureCoord);
-    //vec3 ambient = 0.1 * lightColour;
+    vec3 ambient = 0.1 * lightColour;
 
-    //vec3 normal = normalize(passNormal);
-    //vec3 lightDirection = normalize(lightPosition - passFragPosition);
-    //vec3 eyeDirection = normalize(eyePosition - passFragPosition);
+    vec3 normal = normalize(passNormal);
+    vec3 lightDirection = normalize(lightPosition - passFragPosition);
+    vec3 eyeDirection = normalize(eyePosition - passFragPosition);
 
-    //vec3 reflectDirection = reflect(-lightDirection, normal);
+    vec3 reflectDirection = reflect(-lightDirection, normal);
 
-    //float spec = pow(max(dot(eyeDirection, reflectDirection), 0.0), 32);
-    //vec3 specular = 0.5 * spec * lightColour;
+    float spec = pow(max(dot(eyeDirection, reflectDirection), 0.0), 32);
+    vec3 specular = 0.5 * spec * lightColour;
 
-    //float diff = max(dot(normal, lightDirection), 0.0);
-    //vec3 diffuse = lightColour * diff;
+    float diff = max(dot(normal, lightDirection), 0.0);
+    vec3 diffuse = lightColour * diff;
 
-    //vec4 result = vec4(ambient + specular + diffuse, 1.0); 
-    //outColour *= result;
+    vec4 result = vec4(ambient + specular + diffuse, 1.0); 
+    outColour *= result;
 }
