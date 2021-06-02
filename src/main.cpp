@@ -55,6 +55,7 @@ int main()
         //
         glEnable(GL_DEPTH_TEST);
         //   framebuffer.bind();
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render the regular scene
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -62,6 +63,7 @@ int main()
 
         // Render the frame buffer content to the window
         // Framebuffer::unbind();
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // screenShader.bind();
         //  colour->bind();
         //  screen.getRendable().drawArrays(6);

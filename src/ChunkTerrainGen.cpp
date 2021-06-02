@@ -77,14 +77,19 @@ namespace {
 
                 glm::vec2 coord = (glm::vec2{bx, bz} - WOLRD_SIZE / 2.0f) / WOLRD_SIZE * 2.0f;
 
-                auto noise = getNoiseAt({x, z}, chunkXZ, firstNoise, seed);
-                auto noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise, seed);
-                auto island = rounded(coord) * 1.25;
+                float noise = getNoiseAt({x, z}, chunkXZ, firstNoise, seed);
+                float noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise, seed);
+                float island = rounded(coord) * 1.25;
                 float result = noise * noise2;
+                float height = result * (firstNoise.amplitude + firstNoise.offset);
 
-                float r = static_cast<int>((result * firstNoise.amplitude + firstNoise.offset) * island) - 5;
-                //if (r < WATER_LEVEL) r = WATER_LEVEL - r;
-                heightMap[z * CHUNK_SIZE + x] =r;
+                if (height < WATER_LEVEL - 1) {
+                    int diff = (WATER_LEVEL - 1) - height;
+                    diff /= 4;
+                    height = WATER_LEVEL - diff - 1;
+                }
+
+                heightMap[z * CHUNK_SIZE + x] = (int)(height * island - 5.0f);
             }
         }
 
@@ -155,7 +160,6 @@ namespace {
 
 std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize, int seed)
 {
-    std::cout << "SEED: " << seed << "\n";
     std::vector<ChunkPosition> positions;
     ChunkPosition position{chunkX, 0, chunkZ};
 

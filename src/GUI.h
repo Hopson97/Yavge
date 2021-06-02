@@ -18,6 +18,8 @@ void guiEndFrame();
 
 void guiDebugScreen(const Transform& transform);
 
+void guiGraphicsOptions(bool* doReflection, bool* doRefraction);
+
 struct SpriteRenderer {
   public:
     SpriteRenderer();

@@ -53,6 +53,7 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
 {
     ChunkMesh mesh;
     auto p = chunk.position();
+    mesh.chunkY = chunk.position().y * CHUNK_SIZE;
 
     for (int y = 0; y < CHUNK_SIZE; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {

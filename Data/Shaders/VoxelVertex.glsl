@@ -12,14 +12,10 @@ out vec3 passTextureCoord;
 out vec3 passNormal;
 out vec3 passFragPosition;
 
-uniform vec4 clippingPlane;
 
 void main()
 {   
     vec4 worldPos = modelMatrix * vec4(inVertexCoord, 1.0);
-
-    gl_ClipDistance[0] = dot(worldPos, clippingPlane);
-
 
     gl_Position = projectionViewMatrix * worldPos;
     passTextureCoord = inTexCoord;

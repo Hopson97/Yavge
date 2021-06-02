@@ -42,8 +42,11 @@ class Game {
     void onGUI();
 
   private:
-    void renderScene(const glm::mat4& projectionViewMatrix, const glm::vec4 clipPlane);
+    void renderScene(const glm::mat4& projectionViewMatrix);
     void renderWater(const glm::mat4& projectionViewMatrix);
+
+    void prepareChunkRender(const glm::mat4& projectionViewMatrix);
+    void renderChunks(std::vector<Renderable>& renderList);
 
     void runTerrainThread();
 
@@ -57,8 +60,11 @@ class Game {
     Texture2D m_texture;
     TextureArray2D m_textureArray;
 
-    Framebuffer m_framebufferTest;
-    const Texture2D* m_fboTestTexture = nullptr;
+    Framebuffer m_refractFramebuffer;
+    const Texture2D* m_refractTexture = nullptr;
+
+    Framebuffer m_reflectFramebuffer;
+    const Texture2D* m_reflectTexture = nullptr;
 
     Sun m_sun;
     Transform m_cameraTransform;
@@ -71,7 +77,8 @@ class Game {
     // Chunk render stuff
 
     std::vector<VertexArray> m_chunkVertexArrays;
-    std::vector<Renderable> m_chunkRenderList;
+    std::vector<Renderable> m_chunkUnderWaterRenderList;
+    std::vector<Renderable> m_chunkAboveWaterRenderList;
     VertexArray m_waterQuad;
     Texture2D m_waterTexture;
 
@@ -83,6 +90,9 @@ class Game {
     std::mutex m_chunkUpdateLock;
     std::thread m_chunkMeshGenThread;
     std::atomic_bool m_isRunning{true};
+
+    bool m_doReflection = false;
+    bool m_doRefraction = false;
 
     SpriteRenderer m_guiTexture;
 };

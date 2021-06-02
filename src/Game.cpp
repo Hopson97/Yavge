@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 16;
+constexpr int WORLD_SIZE = 24;
 
 Game::Game()
 {
@@ -18,11 +18,16 @@ Game::Game()
 
     m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE, true));
     
-    m_framebufferTest.create(256, 256);
-    m_framebufferTest.addRenderBuffer();
-    m_framebufferTest.finish();
+    m_refractFramebuffer.create(WIDTH / 1, HEIGHT / 1);
+    m_refractFramebuffer.addRenderBuffer();
+    m_refractFramebuffer.finish();
 
-    m_fboTestTexture = m_framebufferTest.addTexture();
+    m_reflectFramebuffer.create(WIDTH / 1, HEIGHT / 1);
+    m_reflectFramebuffer.addRenderBuffer();
+    m_reflectFramebuffer.finish();
+
+    m_refractTexture = m_refractFramebuffer.addTexture();
+    m_reflectTexture = m_reflectFramebuffer.addTexture();
 
     m_texture.loadFromFile("opengl_logo.png");
     m_waterTexture.loadFromFile("water.png");
@@ -104,8 +109,12 @@ void Game::onUpdate()
 
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(mesh);
-            m_chunkRenderList.push_back(chunkVertexArray.getRendable());
-
+            if (mesh.chunkY >= WATER_LEVEL) {
+                m_chunkAboveWaterRenderList.push_back(chunkVertexArray.getRendable());
+            }
+            else {
+                m_chunkUnderWaterRenderList.push_back(chunkVertexArray.getRendable());
+            }
             m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
         }
     }
@@ -114,33 +123,63 @@ void Game::onUpdate()
 void Game::onRender()
 {
     glEnable(GL_CLIP_DISTANCE0);
+
+    float camY = m_cameraTransform.position.y;
+    float camPitch = m_cameraTransform.rotation.x;
+
+    if (m_doReflection) {
+        m_reflectFramebuffer.bind();
+        m_cameraTransform.position.y -= (camY - WATER_LEVEL) * 2;
+        m_cameraTransform.rotation.x = -camPitch;
+        auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
+        auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderScene(projectionViewMatrix);
+
+        prepareChunkRender(projectionViewMatrix);
+        renderChunks(m_chunkAboveWaterRenderList);
+    }
+
+    m_cameraTransform.position.y = camY;
+    m_cameraTransform.rotation.x = camPitch;
     auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
 
-    // if refraction
-    m_framebufferTest.bind();
-    renderScene(projectionViewMatrix, {0, -1, 0, WATER_LEVEL - 0.1f});
-    m_framebufferTest.unbind();
+    if (m_doRefraction) {
+        m_refractFramebuffer.bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderScene(projectionViewMatrix);
 
-    // if reflection
-    // to do
-
+        prepareChunkRender(projectionViewMatrix);
+        renderChunks(m_chunkUnderWaterRenderList);
+    }
+    Framebuffer::unbind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderWater(projectionViewMatrix);
-    renderScene(projectionViewMatrix, {0, -1, 0, 100000000});
+    renderScene(projectionViewMatrix);
 
-    // Render the chunk
+    prepareChunkRender(projectionViewMatrix);
+    renderChunks(m_chunkUnderWaterRenderList);
+    renderChunks(m_chunkAboveWaterRenderList);
 }
 
 void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform);
+    guiGraphicsOptions(&m_doReflection, &m_doRefraction);
     // gameDebugScreen(m_sun);
 
     constexpr int SIZE = 400;
-    m_guiTexture.render(*m_fboTestTexture, WIDTH - SIZE, HEIGHT - SIZE, SIZE, SIZE);
+    if (m_doRefraction) {
+        m_guiTexture.render(*m_refractTexture, WIDTH - SIZE, HEIGHT - SIZE, SIZE, SIZE);
+    }
+
+    if (m_doReflection) {
+        m_guiTexture.render(*m_reflectTexture, WIDTH - SIZE, (HEIGHT - SIZE * 2), SIZE, SIZE);
+    }
 }
 
-void Game::renderScene(const glm::mat4& projectionViewMatrix, const glm::vec4 clipPlane)
+void Game::renderScene(const glm::mat4& projectionViewMatrix)
 {
     // Normal stuff
     glDisable(GL_CULL_FACE);
@@ -163,21 +202,26 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix, const glm::vec4 cl
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);
     m_lightCube.getRendable().drawElements();
+}
 
+void Game::prepareChunkRender(const glm::mat4& projectionViewMatrix)
+{
     // Chunks
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_voxelShader.set("lightPosition", m_sun.t.position);
     m_voxelShader.set("eyePosition", m_cameraTransform.position);
-    m_voxelShader.set("clippingPlane", clipPlane);
     m_textureArray.bind();
 
     glm::mat4 voxelModel{1.0f};
     voxelModel = glm::translate(voxelModel, {0, 0, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
+}
 
-    for (auto& chunk : m_chunkRenderList) {
+void Game::renderChunks(std::vector<Renderable>& renderList)
+{
+    for (auto& chunk : renderList) {
         chunk.drawElements();
     }
 }
@@ -192,7 +236,7 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("eyePosition", m_cameraTransform.position);
 
     glm::mat4 waterModel{1.0f};
-    // m_fboTestTexture->bind();
+    // m_refractTexture->bind();
     m_waterTexture.bind(0);
     waterModel = glm::translate(waterModel, {0, WATER_LEVEL - 0.1, 0});
     m_waterShader.set("modelMatrix", waterModel);
@@ -206,8 +250,13 @@ void Game::runTerrainThread()
     // 18087 -> Ridge mountins
     // 2914 -> lots of lil island
     // 24777 -> s i c k mountains
+    // 11763 -> Cute islands
+    // 11226 -> awesome mountains
     std::srand(std::time(0));
     int seed = std::rand() % 30000;
+
+    std::cout << "SEED: " << seed << "\n";
+
     while (m_isRunning) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
 

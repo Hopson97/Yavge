@@ -22,6 +22,8 @@ struct ChunkMesh {
     std::vector<VoxelVertex> vertices;
     std::vector<GLuint> indices;
 
+    int chunkY;
+
     GLsizei indicesCount = 0;
 
     void addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chunkPos, const VoxelPosition& position,
