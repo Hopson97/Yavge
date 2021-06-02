@@ -91,8 +91,8 @@ class Game {
     std::thread m_chunkMeshGenThread;
     std::atomic_bool m_isRunning{true};
 
-    bool m_doReflection = false;
-    bool m_doRefraction = false;
+    bool m_doReflection = true;
+    bool m_doRefraction = true;
 
     SpriteRenderer m_guiTexture;
 };

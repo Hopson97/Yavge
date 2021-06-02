@@ -85,7 +85,7 @@ namespace {
 
                 if (height < WATER_LEVEL - 1) {
                     int diff = (WATER_LEVEL - 1) - height;
-                    diff /= 4;
+                    diff -= diff / 2;
                     height = WATER_LEVEL - diff - 1;
                 }
 

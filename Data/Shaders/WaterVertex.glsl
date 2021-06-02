@@ -7,16 +7,20 @@ layout (location = 2) in vec3 inNormal;
 uniform mat4 modelMatrix;
 uniform mat4 projectionViewMatrix;
 
-out vec2 passTextureCoord;
 out vec3 passNormal;
 out vec3 passFragPosition;
+
+out vec4 passClipSpace;
+out vec2 passTexCoords;
 
 void main()
 {
     vec4 worldPos = modelMatrix * vec4(inVertexCoord, 1.0);
-    gl_Position = projectionViewMatrix * worldPos;
-    passTextureCoord = inTexCoord;
+    passClipSpace = projectionViewMatrix * worldPos;
+    gl_Position = passClipSpace;
 
     passNormal = mat3(transpose(inverse(modelMatrix))) * inNormal;
     passFragPosition = vec3(worldPos);
+    passTexCoords = inTexCoord;
+
 }

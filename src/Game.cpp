@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 24;
+constexpr int WORLD_SIZE = 32;
 
 Game::Game()
 {
@@ -12,17 +12,20 @@ Game::Game()
     m_sceneShader   .loadFromFile("SceneVertex.glsl",   "SceneFragment.glsl");
     m_voxelShader   .loadFromFile("VoxelVertex.glsl",   "VoxelFragment.glsl");
     m_waterShader   .loadFromFile("WaterVertex.glsl",   "WaterFragment.glsl");
+
+//    m_waterShader.set("reflectTexture", 0);
+   // m_waterShader.set("refractTexture", 1);
   
     m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
     m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
 
-    m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE, true));
+    m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE * 4, true));
     
-    m_refractFramebuffer.create(WIDTH / 1, HEIGHT / 1);
+    m_refractFramebuffer.create(WIDTH , HEIGHT );
     m_refractFramebuffer.addRenderBuffer();
     m_refractFramebuffer.finish();
 
-    m_reflectFramebuffer.create(WIDTH / 1, HEIGHT / 1);
+    m_reflectFramebuffer.create(WIDTH , HEIGHT);
     m_reflectFramebuffer.addRenderBuffer();
     m_reflectFramebuffer.finish();
 
@@ -124,13 +127,14 @@ void Game::onRender()
 {
     glEnable(GL_CLIP_DISTANCE0);
 
-    float camY = m_cameraTransform.position.y;
-    float camPitch = m_cameraTransform.rotation.x;
+    float distance = (m_cameraTransform.position.y - WATER_LEVEL) * 2;
+        m_cameraTransform.position.y -= distance;
+        m_cameraTransform.rotation.x = -m_cameraTransform.rotation.x;
+
 
     if (m_doReflection) {
         m_reflectFramebuffer.bind();
-        m_cameraTransform.position.y -= (camY - WATER_LEVEL) * 2;
-        m_cameraTransform.rotation.x = -camPitch;
+
         auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
         auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,8 +144,9 @@ void Game::onRender()
         renderChunks(m_chunkAboveWaterRenderList);
     }
 
-    m_cameraTransform.position.y = camY;
-    m_cameraTransform.rotation.x = camPitch;
+    m_cameraTransform.position.y += distance;
+    m_cameraTransform.rotation.x = -m_cameraTransform.rotation.x;
+
     auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
 
@@ -159,7 +164,7 @@ void Game::onRender()
     renderScene(projectionViewMatrix);
 
     prepareChunkRender(projectionViewMatrix);
-    renderChunks(m_chunkUnderWaterRenderList);
+    //renderChunks(m_chunkUnderWaterRenderList);
     renderChunks(m_chunkAboveWaterRenderList);
 }
 
@@ -235,11 +240,21 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("lightPosition", m_sun.t.position);
     m_waterShader.set("eyePosition", m_cameraTransform.position);
 
+    if (m_doReflection) {
+        m_reflectTexture->bind(0);
+    }
+    if (m_doRefraction) {
+        m_refractTexture->bind(1);
+    }
+    
+    if(!m_doRefraction && !m_doReflection) {
+        m_waterTexture.bind(0);
+    }
+
     glm::mat4 waterModel{1.0f};
-    // m_refractTexture->bind();
-    m_waterTexture.bind(0);
     waterModel = glm::translate(waterModel, {0, WATER_LEVEL - 0.1, 0});
     m_waterShader.set("modelMatrix", waterModel);
+    
     m_waterQuad.getRendable().drawElements();
 }
 
