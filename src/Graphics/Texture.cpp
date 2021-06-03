@@ -38,38 +38,50 @@ void Texture2D::loadFromFile(const char* file)
     int width = img.getSize().x;
     int height = img.getSize().y;
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_handle);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureStorage2D(m_handle, 1, GL_RGBA8, width, height);
     glTextureSubImage2D(m_handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, img.getPixelsPtr());
 }
 
 void Texture2D::createFramebufferTexture(GLint width, GLint height)
 {
+    useDefaultFilters();
     glTextureStorage2D(m_handle, 1, GL_RGB8, width, height);
-
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 void Texture2D::createFramebufferDepth(GLint width, GLint height)
 {
+    useDefaultFilters();
     glTextureStorage2D(m_handle, 1, GL_DEPTH_COMPONENT24, width, height);
-
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 void Texture2D::bind(GLenum unit) const
 {
     glBindTextureUnit(unit, m_handle);
+}
+
+void Texture2D::wrapS(GLint param)
+{
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, param);
+}
+void Texture2D::wrapT(GLint param)
+{
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, param);
+}
+void Texture2D::minFilter(GLint param)
+{
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, param);
+}
+void Texture2D::magFilter(GLint param)
+{
+    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, param);
+}
+
+void Texture2D::useDefaultFilters()
+{
+    wrapS(GL_CLAMP_TO_EDGE);
+    wrapT(GL_CLAMP_TO_EDGE);
+    minFilter(GL_LINEAR);
+    magFilter(GL_LINEAR);
 }
 
 TextureArray2D::TextureArray2D()

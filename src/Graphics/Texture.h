@@ -15,6 +15,12 @@ class Texture2D final {
     void createFramebufferTexture(GLint width, GLint height);
     void createFramebufferDepth(GLint width, GLint height);
 
+    void wrapS(GLint param);
+    void wrapT(GLint param);
+    void minFilter(GLint param);
+    void magFilter(GLint param);
+    void useDefaultFilters();
+
   private:
     GLuint m_handle = 0;
 

@@ -28,9 +28,13 @@ Game::Game()
     m_refractTexture = m_refractFramebuffer.addTexture();
     m_reflectTexture = m_reflectFramebuffer.addTexture();
 
+    m_texture.useDefaultFilters();
     m_texture.loadFromFile("opengl_logo.png");
+
+    m_waterTexture.useDefaultFilters();
     m_waterTexture.loadFromFile("water.png");
     m_textureArray.create(16, 16);
+    
     initVoxelSystem(m_textureArray);
 
     auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
@@ -100,7 +104,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate()
 {
-  //  m_sun.update(m_timer.getElapsedTime().asMilliseconds());
+    //  m_sun.update(m_timer.getElapsedTime().asMilliseconds());
     std::unique_lock<std::mutex> l(m_chunkVectorLock);
     while (!m_chunkMeshQueue.empty()) {
 
