@@ -9,6 +9,11 @@
 
 struct Transform;
 
+struct Stats {
+    int totalChunks;
+    int chunksDrawn;
+};
+
 void guiInit(sf::Window& window);
 void guiShutdown();
 
@@ -16,7 +21,7 @@ void guiBeginFrame();
 void guiProcessEvent(sf::Event& event);
 void guiEndFrame();
 
-void guiDebugScreen(const Transform& transform);
+void guiDebugScreen(const Transform& transform, const Stats& stats);
 
 void guiGraphicsOptions(bool* doReflection, bool* doRefraction);
 

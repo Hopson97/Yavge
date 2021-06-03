@@ -22,7 +22,8 @@ struct ChunkMesh {
     std::vector<VoxelVertex> vertices;
     std::vector<GLuint> indices;
 
-    int chunkY;
+    ChunkPosition chunkPos;
+    float chunkPosY;
 
     GLsizei indicesCount = 0;
 

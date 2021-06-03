@@ -84,9 +84,9 @@ namespace {
                 float height = result * (firstNoise.amplitude + firstNoise.offset);
 
                 if (height < WATER_LEVEL - 1) {
-                   int diff = (WATER_LEVEL - 1) - height;
-                   diff -= diff / 2;
-                   height = WATER_LEVEL - diff - 1;
+                    int diff = (WATER_LEVEL - 1) - height;
+                    diff -= diff / 2;
+                    height = WATER_LEVEL - diff - 1;
                 }
 
                 heightMap[z * CHUNK_SIZE + x] = (int)(height * island - 5.0f);

@@ -15,6 +15,17 @@
 
 class Keyboard;
 
+struct ChunkRenderable {
+    ChunkRenderable(const ChunkPosition& chunkPosition, Renderable chunkRenderable)
+        : position(chunkPosition)
+        , renderable(chunkRenderable)
+    {
+    }
+
+    ChunkPosition position;
+    Renderable renderable;
+};
+
 struct Sun {
     Transform t;
     int orbitRadius = CHUNK_SIZE * 4;
@@ -46,7 +57,7 @@ class Game {
     void renderWater(const glm::mat4& projectionViewMatrix);
 
     void prepareChunkRender(const glm::mat4& projectionViewMatrix);
-    void renderChunks(std::vector<Renderable>& renderList);
+    void renderChunks(std::vector<ChunkRenderable>& renderList);
 
     void runTerrainThread();
 
@@ -67,6 +78,8 @@ class Game {
     const Texture2D* m_reflectTexture = nullptr;
 
     Sun m_sun;
+
+    ViewFrustum m_frustum;
     Transform m_cameraTransform;
     Transform m_quadTransform;
 
@@ -77,8 +90,8 @@ class Game {
     // Chunk render stuff
 
     std::vector<VertexArray> m_chunkVertexArrays;
-    std::vector<Renderable> m_chunkUnderWaterRenderList;
-    std::vector<Renderable> m_chunkAboveWaterRenderList;
+    std::vector<ChunkRenderable> m_chunkUnderWaterRenderList;
+    std::vector<ChunkRenderable> m_chunkAboveWaterRenderList;
     VertexArray m_waterQuad;
     Texture2D m_waterTexture;
 
@@ -95,4 +108,6 @@ class Game {
     bool m_doRefraction = true;
 
     SpriteRenderer m_guiTexture;
+
+    Stats m_stats;
 };

@@ -69,9 +69,9 @@ void guiEndFrame(void)
     }
 }
 
-void guiDebugScreen(const Transform& transform)
+void guiDebugScreen(const Transform& transform, const Stats& stats)
 {
-    if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 400, 160), window_flags)) {
+    if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 400, 180), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
         nk_labelf(ctx, NK_STATIC, "Player Position: (%f %f %f)", transform.position[0], transform.position[1],
                   transform.position[2]);
@@ -84,6 +84,8 @@ void guiDebugScreen(const Transform& transform)
 
         nk_labelf(ctx, NK_STATIC, "FPS: %f", fps);
         nk_labelf(ctx, NK_STATIC, "Frame Time: %f", frameTime);
+
+        nk_labelf(ctx, NK_STATIC, "Chunks Drawn: %d / %d", stats.chunksDrawn, stats.totalChunks);
     }
     nk_end(ctx);
 }
@@ -93,7 +95,7 @@ void guiGraphicsOptions(bool* doReflection, bool* doRefraction)
     int reflect = *doReflection;
     int refract = *doRefraction;
 
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 170, 200, 100), window_flags)) {
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 100), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
         nk_checkbox_label(ctx, "Reflection Enabled", &reflect);
 
