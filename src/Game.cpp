@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 16;
+constexpr int WORLD_SIZE = 25;
 
 Game::Game()
 {
