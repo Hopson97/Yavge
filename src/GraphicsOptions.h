@@ -1,8 +1,9 @@
 #pragma once
 
 struct GraphicsOptions {
-    bool doWaterReflection = false;
-    bool doWaterRefraction = false;
+    int doWaterReflection = true;
+    int doWaterRefraction = true;
 
-    bool doFresnel = false;
+    int doFresnel = true;
+    int showPreviews = true;
 };

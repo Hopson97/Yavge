@@ -37,6 +37,15 @@ In order of features added:
 
 ![Phong Lighting](/Screenshots/Base.png "Phong Lighting")
 
+### Reflection and Refraction
+
+![Reflection and Refraction](/Screenshots/ReflectRefractMaps.png "Reflection and Refraction")
+
+### Fresnel Effect
+
+![Fresnel Effect](/Screenshots/FresnelEffect.png "Fresnel Effect")
+
+
 ## Mistakes Were Made...
 
 As this was my first time using DSA and more advanced computer graphics techniques, I ran into problems, which will be listed here so I don't run into them again:

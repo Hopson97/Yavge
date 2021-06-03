@@ -35,7 +35,9 @@ Game::Game()
 
     auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
     m_cameraTransform = { {c, CHUNK_SIZE * 5, c}, {0, 0, 0} };
-    m_sun.t.position.y = CHUNK_SIZE * 4;
+    m_sun.t.position.y = CHUNK_SIZE * 3;
+    m_sun.t.position.x = CHUNK_SIZE * WORLD_SIZE / 2;
+    m_sun.t.position.z = CHUNK_SIZE *  WORLD_SIZE / 2;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
@@ -98,7 +100,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate()
 {
-    m_sun.update(m_timer.getElapsedTime().asMilliseconds());
+  //  m_sun.update(m_timer.getElapsedTime().asMilliseconds());
     std::unique_lock<std::mutex> l(m_chunkVectorLock);
     while (!m_chunkMeshQueue.empty()) {
 
@@ -170,15 +172,16 @@ void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform, m_stats);
     guiGraphicsOptions(&m_options);
-    // gameDebugScreen(m_sun);
 
-    constexpr int SIZE = 400;
-    if (m_options.doWaterRefraction) {
-        m_guiTexture.render(*m_refractTexture, WIDTH - SIZE, HEIGHT - SIZE, SIZE, SIZE);
-    }
+    if (m_options.showPreviews) {
+        constexpr int SIZE = 400;
+        if (m_options.doWaterRefraction) {
+            m_guiTexture.render(*m_refractTexture, WIDTH - SIZE, HEIGHT - SIZE, SIZE, SIZE);
+        }
 
-    if (m_options.doWaterReflection) {
-        m_guiTexture.render(*m_reflectTexture, WIDTH - SIZE, (HEIGHT - SIZE * 2), SIZE, SIZE);
+        if (m_options.doWaterReflection) {
+            m_guiTexture.render(*m_reflectTexture, WIDTH - SIZE, (HEIGHT - SIZE * 2), SIZE, SIZE);
+        }
     }
 }
 
