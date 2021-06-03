@@ -34,14 +34,18 @@ Game::Game()
     m_waterTexture.useDefaultFilters();
     m_waterTexture.loadFromFile("water.png");
     m_textureArray.create(16, 16);
-    
+
+    m_waterNormalTexture.wrapS(GL_REPEAT);
+    m_waterNormalTexture.wrapT(GL_REPEAT);
+    m_waterNormalTexture.minFilter(GL_NEAREST);
+    m_waterNormalTexture.magFilter(GL_NEAREST);
+    m_waterNormalTexture.loadFromFile("WaterDUDV.png");
+
     initVoxelSystem(m_textureArray);
 
     auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
-    m_cameraTransform = { {c, CHUNK_SIZE * 5, c}, {0, 0, 0} };
+    m_cameraTransform = { {c, CHUNK_SIZE * 1.5, c}, {0, 0, 0} };
     m_sun.t.position.y = CHUNK_SIZE * 3;
-    m_sun.t.position.x = CHUNK_SIZE * WORLD_SIZE / 2;
-    m_sun.t.position.z = CHUNK_SIZE *  WORLD_SIZE / 2;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
@@ -73,7 +77,10 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 {
     Transform& camera = m_cameraTransform;
 
-    const float PLAYER_SPEED = 1.0f;
+    float PLAYER_SPEED = 0.5f;
+    if (keyboard.isKeyDown(sf::Keyboard::LControl)) {
+        PLAYER_SPEED = 5.0f;
+    }
     if (keyboard.isKeyDown(sf::Keyboard::W)) {
         camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
     }
@@ -104,7 +111,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate()
 {
-    //  m_sun.update(m_timer.getElapsedTime().asMilliseconds());
+    m_sun.update(m_timer.getElapsedTime().asMilliseconds());
     std::unique_lock<std::mutex> l(m_chunkVectorLock);
     while (!m_chunkMeshQueue.empty()) {
 
@@ -141,6 +148,8 @@ void Game::onRender()
         auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
         auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
         m_frustum.update(projectionViewMatrix);
+
+        setClearColour(COLOUR_SKY_BLUE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderScene(projectionViewMatrix);
 
@@ -156,15 +165,18 @@ void Game::onRender()
     m_frustum.update(projectionViewMatrix);
 
     if (m_options.doWaterRefraction) {
+        setClearColour(COLOUR_SAND);
         m_refractFramebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderScene(projectionViewMatrix);
 
         prepareChunkRender(projectionViewMatrix);
         renderChunks(m_chunkUnderWaterRenderList);
     }
+
+    setClearColour(COLOUR_SKY_BLUE);
     Framebuffer::unbind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     renderWater(projectionViewMatrix);
     renderScene(projectionViewMatrix);
 
@@ -248,6 +260,8 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("lightPosition", m_sun.t.position);
     m_waterShader.set("eyePosition", m_cameraTransform.position);
     m_waterShader.set("useFresnal", m_options.doFresnel);
+    m_waterShader.set("useDUDVMaps", m_options.useDistortMaps);
+    m_waterShader.set("time", m_timer.getElapsedTime().asSeconds());
 
     if (m_options.doWaterReflection) {
         m_reflectTexture->bind(0);
@@ -261,8 +275,11 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     else {
         m_waterTexture.bind(1);
     }
+
+    m_waterNormalTexture.bind(2);
+
     glm::mat4 waterModel{1.0f};
-    waterModel = glm::translate(waterModel, {0, WATER_LEVEL, 0});
+    waterModel = glm::translate(waterModel, {0, WATER_LEVEL + 0.1, 0});
     m_waterShader.set("modelMatrix", waterModel);
 
     m_waterQuad.getRendable().drawElements();

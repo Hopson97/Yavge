@@ -6,12 +6,15 @@ layout (location = 2) in vec3 inNormal;
 
 uniform mat4 modelMatrix;
 uniform mat4 projectionViewMatrix;
+uniform float time;
 
 out vec3 passNormal;
 out vec3 passFragPosition;
 
 out vec4 passClipSpace;
 out vec2 passTexCoords;
+out float passTime;
+
 
 void main()
 {
@@ -22,5 +25,5 @@ void main()
     passNormal = mat3(transpose(inverse(modelMatrix))) * inNormal;
     passFragPosition = vec3(worldPos);
     passTexCoords = inTexCoord;
-
+    passTime = time;
 }

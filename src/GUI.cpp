@@ -93,16 +93,16 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
 
 void guiGraphicsOptions(GraphicsOptions* options)
 {
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 200), window_flags)) {
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 400), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
 
         nk_checkbox_label(ctx, "Reflection Enabled", &options->doWaterReflection);
         nk_checkbox_label(ctx, "Refractions Enabled", &options->doWaterRefraction);
         nk_checkbox_label(ctx, "Fresnel Effect", &options->doFresnel);
         nk_checkbox_label(ctx, "Show Previews", &options->showPreviews);
+        nk_checkbox_label(ctx, "Water Distortian", &options->useDistortMaps);
     }
     nk_end(ctx);
-
 }
 
 SpriteRenderer::SpriteRenderer()

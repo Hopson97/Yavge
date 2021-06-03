@@ -6,4 +6,6 @@ struct GraphicsOptions {
 
     int doFresnel = true;
     int showPreviews = true;
+
+    int useDistortMaps = false;
 };

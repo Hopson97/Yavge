@@ -14,6 +14,7 @@ struct Colour {
     uint8_t red = 255;
     uint8_t green = 255;
     uint8_t blue = 255;
+    uint8_t alpha = 255;
 };
 
 enum ColourSetMode {
@@ -54,3 +55,7 @@ void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue);
 void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue);
 
 bool initWindow(sf::Window* window);
+
+const Colour COLOUR_SKY_BLUE = {135, 206, 235, 255};
+const Colour COLOUR_SAND = {	235, 214, 135, 255};
+void setClearColour(Colour colour);

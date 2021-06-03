@@ -159,3 +159,12 @@ bool initWindow(sf::Window* window)
     initGLDebug();
     return true;
 }
+
+void setClearColour(Colour colour)
+{
+    float r = (float)colour.red / 255.0f;
+    float g = (float)colour.green / 255.0f;
+    float b = (float)colour.blue / 255.0f;
+    float a = (float)colour.alpha / 255.0f;
+    glClearColor(r, g, b, a);
+}

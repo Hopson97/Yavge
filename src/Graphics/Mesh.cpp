@@ -162,8 +162,8 @@ Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat)
             vertex.position.y = height;
             vertex.position.z = fz / fEdgeVertexCount * size;
 
-            vertex.textureCoord.s = fx / fEdgeVertexCount;
-            vertex.textureCoord.t = fz / fEdgeVertexCount;
+            vertex.textureCoord.s = (fx / fEdgeVertexCount) * edgeVertices / 16;
+            vertex.textureCoord.t = (fz / fEdgeVertexCount) * edgeVertices / 16;
 
             float h1 = getHeight(hx - 1, hz);
             float h2 = getHeight(hx + 1, hz);

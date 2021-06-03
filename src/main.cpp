@@ -15,7 +15,6 @@ int main()
     window.setFramerateLimit(60);
     guiInit(window);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.3f, 0.8f, 1.0f, 0.0f);
 
     // Final render target
     // VertexArray screen;
@@ -58,6 +57,7 @@ int main()
         // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render the regular scene
+        setClearColour(COLOUR_SKY_BLUE);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         game.onRender();
 

@@ -70,6 +70,7 @@ class Game {
     VertexArray m_lightCube;
 
     Texture2D m_texture;
+    Texture2D m_waterNormalTexture;
     TextureArray2D m_textureArray;
 
     Framebuffer m_refractFramebuffer;
