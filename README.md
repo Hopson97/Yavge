@@ -29,7 +29,15 @@ sh scripts/build.sh release
 sh scripts/run.sh release
 ```
 
-## Issues ran into
+## Screenshots
+
+In order of features added:
+
+### Phong Lighting (Base)
+
+![Phong Lighting](/Screenshots/Base.png "Phong Lighting")
+
+## Mistakes Were Made...
 
 As this was my first time using DSA and more advanced computer graphics techniques, I ran into problems, which will be listed here so I don't run into them again:
 
