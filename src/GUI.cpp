@@ -1,5 +1,6 @@
 #include "GUI.h"
 
+#include "GraphicsOptions.h"
 #include "Maths.h"
 #include "Utility.h"
 #include <nuklear/nuklear_def.h>
@@ -90,22 +91,24 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
     nk_end(ctx);
 }
 
-void guiGraphicsOptions(bool* doReflection, bool* doRefraction)
+void guiGraphicsOptions(GraphicsOptions* options)
 {
-    int reflect = *doReflection;
-    int refract = *doRefraction;
+    int reflect = options->doWaterReflection;
+    int refract = options->doWaterRefraction;
+    int fres = options->doFresnel;
 
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 100), window_flags)) {
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 200), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
+
         nk_checkbox_label(ctx, "Reflection Enabled", &reflect);
-
-        nk_layout_row_dynamic(ctx, 25, 1);
         nk_checkbox_label(ctx, "Refractions Enabled", &refract);
+        nk_checkbox_label(ctx, "Fresnel Effect", &fres);
     }
     nk_end(ctx);
 
-    *doReflection = reflect;
-    *doRefraction = refract;
+    options->doWaterReflection = reflect;
+    options->doWaterRefraction = refract;
+    options->doFresnel = fres;
 }
 
 SpriteRenderer::SpriteRenderer()

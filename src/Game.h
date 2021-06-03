@@ -3,6 +3,7 @@
 #include "Chunk.h"
 #include "GUI.h"
 #include "Graphics/GLWrappers.h"
+#include "GraphicsOptions.h"
 #include "Maths.h"
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Window.hpp>
@@ -103,11 +104,8 @@ class Game {
     std::mutex m_chunkUpdateLock;
     std::thread m_chunkMeshGenThread;
     std::atomic_bool m_isRunning{true};
-
-    bool m_doReflection = true;
-    bool m_doRefraction = true;
-
     SpriteRenderer m_guiTexture;
 
+    GraphicsOptions m_options;
     Stats m_stats;
 };

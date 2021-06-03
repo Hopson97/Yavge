@@ -12,6 +12,8 @@ uniform vec3 lightColour;
 uniform vec3 lightPosition;
 uniform vec3 eyePosition;
 
+uniform bool useFresnal;
+
 in vec2 passTexCoords;
 in vec4 passClipSpace;
 
@@ -23,11 +25,8 @@ void main()
     vec2 refractTexCoords = deviceCoords;
     vec2 reflectTexCoords = vec2(deviceCoords.x, 1-deviceCoords.y);
 
-
-
     vec4 refractColour = texture(refractTexture, refractTexCoords);
     vec4 reflectColour = texture(reflectTexture, reflectTexCoords);
-    outColour = mix (reflectColour, refractColour, 0.5);
 
 
 
@@ -44,9 +43,20 @@ void main()
     float spec = pow(max(dot(eyeDirection, reflectDirection), 0.0), 32);
     vec3 specular = 0.5 * spec * lightColour;
 
+
     float diff = max(dot(normal, lightDirection), 0.0);
     vec3 diffuse = lightColour * diff;
 
+    
+    float refractiveFactor = dot(eyeDirection, normal);
+    if (useFresnal) {
+        outColour = mix(reflectColour, refractColour, useFresnal ? refractiveFactor : 0.5);
+    }
+    else {
+        outColour = mix(reflectColour, refractColour, 0.5);
+    }
+
     vec4 result = vec4(ambient + specular + diffuse, 1.0); 
-    outColour *= result;
+
+    outColour *= result;// * vec4(1, 1, 2, 1);
 }

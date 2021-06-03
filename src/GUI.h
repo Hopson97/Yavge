@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 
 struct Transform;
-
+struct GraphicsOptions;
 struct Stats {
     int totalChunks;
     int chunksDrawn;
@@ -23,7 +23,7 @@ void guiEndFrame();
 
 void guiDebugScreen(const Transform& transform, const Stats& stats);
 
-void guiGraphicsOptions(bool* doReflection, bool* doRefraction);
+void guiGraphicsOptions(GraphicsOptions* options);
 
 struct SpriteRenderer {
   public:

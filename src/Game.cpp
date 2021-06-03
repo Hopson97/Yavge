@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 64;
+constexpr int WORLD_SIZE = 16;
 
 Game::Game()
 {
@@ -129,7 +129,7 @@ void Game::onRender()
     m_cameraTransform.position.y -= distance;
     m_cameraTransform.rotation.x = -m_cameraTransform.rotation.x;
 
-    if (m_doReflection) {
+    if (m_options.doWaterReflection) {
         m_reflectFramebuffer.bind();
 
         auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
@@ -149,7 +149,7 @@ void Game::onRender()
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
     m_frustum.update(projectionViewMatrix);
 
-    if (m_doRefraction) {
+    if (m_options.doWaterRefraction) {
         m_refractFramebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderScene(projectionViewMatrix);
@@ -169,15 +169,15 @@ void Game::onRender()
 void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform, m_stats);
-    guiGraphicsOptions(&m_doReflection, &m_doRefraction);
+    guiGraphicsOptions(&m_options);
     // gameDebugScreen(m_sun);
 
     constexpr int SIZE = 400;
-    if (m_doRefraction) {
+    if (m_options.doWaterRefraction) {
         m_guiTexture.render(*m_refractTexture, WIDTH - SIZE, HEIGHT - SIZE, SIZE, SIZE);
     }
 
-    if (m_doReflection) {
+    if (m_options.doWaterReflection) {
         m_guiTexture.render(*m_reflectTexture, WIDTH - SIZE, (HEIGHT - SIZE * 2), SIZE, SIZE);
     }
 }
@@ -240,23 +240,20 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_waterShader.set("lightPosition", m_sun.t.position);
     m_waterShader.set("eyePosition", m_cameraTransform.position);
+    m_waterShader.set("useFresnal", m_options.doFresnel);
 
-    if (m_doReflection) {
+    if (m_options.doWaterReflection) {
         m_reflectTexture->bind(0);
     }
     else {
         m_waterTexture.bind(0);
     }
-    if (m_doRefraction) {
+    if (m_options.doWaterRefraction) {
         m_refractTexture->bind(1);
     }
     else {
         m_waterTexture.bind(1);
     }
-
-    if (!m_doRefraction && !m_doReflection) {
-    }
-
     glm::mat4 waterModel{1.0f};
     waterModel = glm::translate(waterModel, {0, WATER_LEVEL, 0});
     m_waterShader.set("modelMatrix", waterModel);
