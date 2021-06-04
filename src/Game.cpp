@@ -4,7 +4,6 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-constexpr int WORLD_SIZE = 16;
 
 Game::Game()
 {
@@ -15,7 +14,6 @@ Game::Game()
     m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
     m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
 
-    m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE * 4, true));
     
     m_refractFramebuffer.create(WIDTH , HEIGHT);
     m_refractFramebuffer.addRenderBuffer();
@@ -28,10 +26,8 @@ Game::Game()
     m_refractTexture = m_refractFramebuffer.addTexture();
     m_reflectTexture = m_reflectFramebuffer.addTexture();
 
-    m_texture.useDefaultFilters();
     m_texture.loadFromFile("OpenGLLogo.png", 1);
 
-    m_waterTexture.useDefaultFilters();
     m_waterTexture.loadFromFile("Water.png", 1);
     m_textureArray.create(16, 16);
 
@@ -43,15 +39,43 @@ Game::Game()
 
     initVoxelSystem(m_textureArray);
 
-    auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
-    m_cameraTransform = { {c, CHUNK_SIZE * 1.5, c}, {0, 0, 0} };
-    m_sun.t.position.y = CHUNK_SIZE * 4;
-
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
-    for (int x = 0; x < WORLD_SIZE; x++) {
-        for (int z = 0; z < WORLD_SIZE; z++) {
+    resetWorld(8);
+
+    m_cameraTransform = { {CHUNK_SIZE, CHUNK_SIZE * 1.5, CHUNK_SIZE}, {0, 0, 0} };
+
+    // clang-format on
+}
+
+void Game::resetWorld(int worldSize)
+{
+    m_worldSize = worldSize;
+    m_isRunning = false;
+    if (m_chunkMeshGenThread.joinable()) {
+        m_chunkMeshGenThread.join();
+    }
+    m_isRunning = true;
+
+    m_chunkMeshQueue = std::queue<ChunkMesh>();
+    m_chunkReadyForMeshingQueue = std::queue<ChunkPosition>();
+    m_chunkUpdateQueue = std::queue<ChunkPosition>();
+
+    m_chunkMap.destroyWorld();
+    m_chunkVertexArrays.clear();
+    m_chunkUnderWaterRenderList.clear();
+    m_chunkAboveWaterRenderList.clear();
+
+    int center = CHUNK_SIZE * worldSize / 2 - CHUNK_SIZE / 2;
+    m_sun.center = center;
+
+    m_waterQuad.reset();
+    m_waterQuad.bufferMesh(createTerrainMesh(CHUNK_SIZE * worldSize, CHUNK_SIZE * 4, true));
+
+
+    for (int x = 0; x < worldSize; x++) {
+        for (int z = 0; z < worldSize; z++) {
             m_chunkUpdateQueue.push({x, 0, z});
         }
     }
@@ -60,10 +84,8 @@ Game::Game()
         runTerrainThread();
     });
 
-    glCullFace(GL_BACK);
-
-    // clang-format on
 }
+
 
 Game::~Game()
 {
@@ -141,7 +163,6 @@ void Game::onRender()
     auto& underwater = m_chunkUnderWaterRenderList;
     auto& aboveWater = m_chunkAboveWaterRenderList;
 
-    glEnable(GL_CLIP_DISTANCE0);
     float distance = (m_cameraTransform.position.y - WATER_LEVEL) * 2;
 
     m_cameraTransform.position.y -= distance;
@@ -193,7 +214,7 @@ void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform, m_stats);
     guiGraphicsOptions(&m_options);
-
+    guiResetWorld(this, &Game::resetWorld);
     if (m_options.showPreviews) {
         constexpr int SIZE = 400;
         if (m_options.doWaterRefraction) {
@@ -318,7 +339,7 @@ void Game::runTerrainThread()
             if (!m_chunkUpdateQueue.empty()) {
                 ChunkPosition& p = m_chunkUpdateQueue.front();
                 m_chunkUpdateQueue.pop();
-                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, WORLD_SIZE, seed);
+                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, m_worldSize, seed);
                 for (const auto& p : pos) {
                     m_chunkReadyForMeshingQueue.push(p);
                 }

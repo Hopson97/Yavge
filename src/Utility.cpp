@@ -157,6 +157,7 @@ bool initWindow(sf::Window* window)
         return false;
     }
     initGLDebug();
+    glCullFace(GL_BACK);
     return true;
 }
 

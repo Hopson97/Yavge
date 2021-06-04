@@ -14,12 +14,15 @@ struct Stats {
     int chunksDrawn;
 };
 
+class Game;
+
 void guiInit(sf::Window& window);
 void guiShutdown();
 
 void guiBeginFrame();
 void guiProcessEvent(sf::Event& event);
 void guiEndFrame();
+void guiResetWorld(Game* game, void(Game::*resetWorldFunc)(int));
 
 void guiDebugScreen(const Transform& transform, const Stats& stats);
 

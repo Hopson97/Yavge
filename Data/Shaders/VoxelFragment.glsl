@@ -14,7 +14,7 @@ uniform vec3 eyePosition;
 
 void main()
 {
-    vec3 ambient = 0.1 * lightColour;
+    vec3 ambient = 0.2 * lightColour;
 
     vec3 normal = normalize(passNormal);
     vec3 lightDirection = normalize(lightPosition - passFragPosition);

@@ -72,6 +72,8 @@ class ChunkMap {
 
     bool hasNeighbours(const ChunkPosition& chunkPosition) const;
 
+    void destroyWorld();
+
   private:
     std::unordered_map<ChunkPosition, Chunk, ChunkPositionHash> m_chunks;
 

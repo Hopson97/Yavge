@@ -5,6 +5,7 @@
 #include "Utility.h"
 #include <nuklear/nuklear_def.h>
 #include <nuklear/nuklear_sfml_gl3.h>
+#include "Game.h"
 
 #define MAX_VERTEX_MEMORY 0x80000
 #define MAX_ELEMENT_MEMORY 0x80000
@@ -105,6 +106,21 @@ void guiGraphicsOptions(GraphicsOptions* options)
         nk_checkbox_label(ctx, "Water Normal", &options->useNormal);
 
         nk_checkbox_label(ctx, "Show Previews", &options->showPreviews);
+
+    }
+    nk_end(ctx);
+}
+
+void guiResetWorld(Game* game, void(Game::*resetWorldFunc)(int))
+{
+    static int worldSize = 8;
+    if (nk_begin(ctx, "World Reset", nk_rect(10, 600, 200, 200), window_flags)) {
+        nk_layout_row_dynamic(ctx, 25, 1);
+        nk_labelf(ctx, NK_STATIC, "World Size: %d", worldSize);
+        nk_slider_int(ctx, 4, &worldSize, 40, 1);
+        if(nk_button_label(ctx, "Reset World")) {
+            (*game.*resetWorldFunc)(worldSize);
+        }
 
     }
     nk_end(ctx);

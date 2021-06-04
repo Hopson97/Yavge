@@ -45,6 +45,19 @@ VertexArray::~VertexArray()
     }
 }
 
+void VertexArray::reset()
+{
+    if (m_vao) {
+        glDeleteVertexArrays(1, &m_vao);
+        glDeleteBuffers(1, &m_vbo);
+        glDeleteBuffers(1, &m_ibo);
+    }
+    glCreateVertexArrays(1, &m_vao);
+    glCreateBuffers(1, &m_vbo);
+    glCreateBuffers(1, &m_ibo);
+    m_numIndices = 0;
+}
+
 void VertexArray::bufferVertexData(const std::vector<Vertex>& verts)
 {
     // glBufferData

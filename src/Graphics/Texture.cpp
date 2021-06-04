@@ -40,6 +40,7 @@ void Texture2D::loadFromFile(const char* file, int mipmapLevels)
 
     glTextureStorage2D(m_handle, mipmapLevels, GL_RGBA8, width, height);
     glTextureSubImage2D(m_handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, img.getPixelsPtr());
+    useDefaultFilters();
 }
 
 void Texture2D::createFramebufferTexture(GLint width, GLint height)

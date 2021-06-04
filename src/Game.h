@@ -31,11 +31,13 @@ struct Sun {
     Transform t;
     int orbitRadius = CHUNK_SIZE;
     int orbitSpeed = 24000;
+    int center;
+    
     void update(float time)
     {
         float rads = (2.0f * 3.14159f / orbitSpeed * time);
-        t.position.x = CHUNK_SIZE * 8 + sin(rads) * orbitRadius;
-        t.position.z = CHUNK_SIZE * 8 + cos(rads) * orbitRadius;
+        t.position.x = center + sin(rads) * orbitRadius;
+        t.position.z = center + cos(rads) * orbitRadius;
         t.position.y = CHUNK_SIZE * 5;
     }
 };
@@ -55,6 +57,7 @@ class Game {
     void onGUI();
 
   private:
+    void resetWorld(int worldSize);
     void renderScene(const glm::mat4& projectionViewMatrix);
     void renderWater(const glm::mat4& projectionViewMatrix);
 
@@ -111,6 +114,8 @@ class Game {
 
     GraphicsOptions m_options;
     Stats m_stats;
+
+    int m_worldSize = 0;
 
     bool m_isUnderwater = false;
 };

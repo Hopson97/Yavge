@@ -14,7 +14,6 @@ int main()
     }
     window.setFramerateLimit(60);
     guiInit(window);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Final render target
     // VertexArray screen;

@@ -37,6 +37,7 @@ class VertexArray final {
     VertexArray& operator=(VertexArray&& other);
     VertexArray(VertexArray&& other);
     ~VertexArray();
+    void reset();
 
     VertexArray& operator=(VertexArray& other) = delete;
     VertexArray(VertexArray& other) = delete;
