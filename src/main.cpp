@@ -42,6 +42,7 @@ int main()
                 }
                 else if (e.key.code == sf::Keyboard::L) {
                     isMouseActive = !isMouseActive;
+                    window.setMouseCursorVisible(!isMouseActive);
                 }
             }
         }

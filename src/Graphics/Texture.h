@@ -11,7 +11,7 @@ class Texture2D final {
 
     void bind(GLenum unit) const;
 
-    void loadFromFile(const char* file);
+    void loadFromFile(const char* file, int mipmapLevels);
     void createFramebufferTexture(GLint width, GLint height);
     void createFramebufferDepth(GLint width, GLint height);
 

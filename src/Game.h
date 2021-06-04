@@ -29,14 +29,14 @@ struct ChunkRenderable {
 
 struct Sun {
     Transform t;
-    int orbitRadius = CHUNK_SIZE * 2;
-    int orbitSpeed = 8000;
+    int orbitRadius = CHUNK_SIZE;
+    int orbitSpeed = 24000;
     void update(float time)
     {
         float rads = (2.0f * 3.14159f / orbitSpeed * time);
         t.position.x = CHUNK_SIZE * 8 + sin(rads) * orbitRadius;
         t.position.z = CHUNK_SIZE * 8 + cos(rads) * orbitRadius;
-        t.position.y = CHUNK_SIZE * 10;
+        t.position.y = CHUNK_SIZE * 5;
     }
 };
 

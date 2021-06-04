@@ -93,8 +93,10 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
 
 void guiGraphicsOptions(GraphicsOptions* options)
 {
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 200, 400), window_flags)) {
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 300, 400), window_flags)) {
         nk_layout_row_dynamic(ctx, 25, 1);
+        nk_labelf(ctx, NK_STATIC, "Press 'L' to unlock/lock mouse.");
+        nk_labelf(ctx, NK_STATIC, "Press 'ESC' to exit.");
 
         nk_checkbox_label(ctx, "Reflection Enabled", &options->doWaterReflection);
         nk_checkbox_label(ctx, "Refractions Enabled", &options->doWaterRefraction);
@@ -113,7 +115,7 @@ SpriteRenderer::SpriteRenderer()
     glm::mat4 orthoMatrix{1.0f};
     orthoMatrix = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
     m_guiShader.loadFromFile("GUIVertex.glsl", "GUIFragment.glsl");
-    m_guiBorder.loadFromFile("GUIBorder.png");
+    m_guiBorder.loadFromFile("GUIBorder.png", 1);
 
     m_guiShader.bind();
     m_guiShader.set("orthographicMatrix", orthoMatrix);

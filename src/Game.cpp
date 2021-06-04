@@ -17,7 +17,7 @@ Game::Game()
 
     m_waterQuad .bufferMesh(createTerrainMesh(CHUNK_SIZE * WORLD_SIZE, CHUNK_SIZE * 4, true));
     
-    m_refractFramebuffer.create(WIDTH , HEIGHT );
+    m_refractFramebuffer.create(WIDTH , HEIGHT);
     m_refractFramebuffer.addRenderBuffer();
     m_refractFramebuffer.finish();
 
@@ -29,24 +29,17 @@ Game::Game()
     m_reflectTexture = m_reflectFramebuffer.addTexture();
 
     m_texture.useDefaultFilters();
-    m_texture.loadFromFile("OpenGLLogo.png");
+    m_texture.loadFromFile("OpenGLLogo.png", 1);
 
     m_waterTexture.useDefaultFilters();
-    m_waterTexture.loadFromFile("Water.png");
+    m_waterTexture.loadFromFile("Water.png", 1);
     m_textureArray.create(16, 16);
 
-    m_waterDistortTexture.wrapS(GL_REPEAT);
-    m_waterDistortTexture.wrapT(GL_REPEAT);
-    m_waterDistortTexture.minFilter(GL_NEAREST);
-    m_waterDistortTexture.magFilter(GL_NEAREST);
-    m_waterDistortTexture.loadFromFile("WaterDUDV.png");
+    m_waterDistortTexture.loadFromFile("WaterDUDV.png", 8);
+    m_waterDistortTexture.useDefaultFilters();
 
-    m_waterNormalTexture.wrapS(GL_REPEAT);
-    m_waterNormalTexture.wrapT(GL_REPEAT);
-    m_waterNormalTexture.minFilter(GL_NEAREST);
-    m_waterNormalTexture.magFilter(GL_NEAREST);
-    m_waterNormalTexture.loadFromFile("WaterNormal.jpg");
-
+    m_waterNormalTexture.loadFromFile("WaterNormal.png", 4);
+    m_waterNormalTexture.useDefaultFilters();
 
     initVoxelSystem(m_textureArray);
 

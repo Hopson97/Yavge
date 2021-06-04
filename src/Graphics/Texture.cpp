@@ -27,7 +27,7 @@ Texture2D::~Texture2D()
     glDeleteTextures(1, &m_handle);
 }
 
-void Texture2D::loadFromFile(const char* file)
+void Texture2D::loadFromFile(const char* file, int mipmapLevels)
 {
     char texturePath[128] = "Data/Textures/";
     std::strcat(texturePath, file);
@@ -38,20 +38,20 @@ void Texture2D::loadFromFile(const char* file)
     int width = img.getSize().x;
     int height = img.getSize().y;
 
-    glTextureStorage2D(m_handle, 1, GL_RGBA8, width, height);
+    glTextureStorage2D(m_handle, mipmapLevels, GL_RGBA8, width, height);
     glTextureSubImage2D(m_handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, img.getPixelsPtr());
 }
 
 void Texture2D::createFramebufferTexture(GLint width, GLint height)
 {
-    useDefaultFilters();
     glTextureStorage2D(m_handle, 1, GL_RGB8, width, height);
+    useDefaultFilters();
 }
 
 void Texture2D::createFramebufferDepth(GLint width, GLint height)
 {
-    useDefaultFilters();
     glTextureStorage2D(m_handle, 1, GL_DEPTH_COMPONENT24, width, height);
+    useDefaultFilters();
 }
 
 void Texture2D::bind(GLenum unit) const
@@ -78,10 +78,14 @@ void Texture2D::magFilter(GLint param)
 
 void Texture2D::useDefaultFilters()
 {
-    wrapS(GL_CLAMP_TO_EDGE);
-    wrapT(GL_CLAMP_TO_EDGE);
-    minFilter(GL_LINEAR);
-    magFilter(GL_LINEAR);
+    glGenerateTextureMipmap(m_handle);
+
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameterf(m_handle, GL_TEXTURE_LOD_BIAS, -0.6f);
 }
 
 TextureArray2D::TextureArray2D()
@@ -123,15 +127,14 @@ void TextureArray2D::create(GLuint textureDims, GLuint textureCount)
 {
     m_textureDims = textureDims;
     m_maxTextures = textureCount;
+    
+    glTextureStorage3D(m_handle, 1, GL_RGBA8, textureDims, textureDims, textureCount);
 
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    glGenerateTextureMipmap(m_handle);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTextureParameterf(m_handle, GL_TEXTURE_LOD_BIAS, -1.0f);
-    glTextureStorage3D(m_handle, 1, GL_RGBA8, textureDims, textureDims, textureCount);
 }
 
 GLuint TextureArray2D::addTexture(const char* file)
