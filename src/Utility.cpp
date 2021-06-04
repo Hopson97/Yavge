@@ -150,7 +150,7 @@ bool initWindow(sf::Window* window)
     contextSettings.minorVersion = 5;
     contextSettings.attributeFlags = sf::ContextSettings::Core;
     window->create({1600, 900}, "Y A V G E", sf::Style::Close, contextSettings);
-    window->setPosition({window->getPosition().x, 0});
+    window->setPosition({(int)sf::VideoMode::getDesktopMode().width / 2 + 150, HEIGHT / 16});
 
     if (!gladLoadGL()) {
         printf("Error: Could not load OpenGL.");
