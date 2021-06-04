@@ -9,12 +9,12 @@ namespace {
 
 void initVoxelSystem(TextureArray2D& textureArray)
 {
-    GLuint tGrass = textureArray.addTexture("grass.png");
-    GLuint tGrassSide = textureArray.addTexture("grass_side.png");
-    GLuint tDirt = textureArray.addTexture("dirt.png");
-    GLuint tStone = textureArray.addTexture("stone.png");
-    GLuint tWater = textureArray.addTexture("water.png");
-    GLuint tSand = textureArray.addTexture("sand.png");
+    GLuint tGrass = textureArray.addTexture("Grass.png");
+    GLuint tGrassSide = textureArray.addTexture("GrassSide.png");
+    GLuint tDirt = textureArray.addTexture("Dirt.png");
+    GLuint tStone = textureArray.addTexture("Stone.png");
+    GLuint tWater = textureArray.addTexture("Water.png");
+    GLuint tSand = textureArray.addTexture("Sand.png");
 
     voxels[AIR] = {"Air", 0, 0, 0, false};
     voxels[GRASS] = {"Grass", tGrass, tGrassSide, tDirt, false};

@@ -29,10 +29,10 @@ Game::Game()
     m_reflectTexture = m_reflectFramebuffer.addTexture();
 
     m_texture.useDefaultFilters();
-    m_texture.loadFromFile("opengl_logo.png");
+    m_texture.loadFromFile("OpenGLLogo.png");
 
     m_waterTexture.useDefaultFilters();
-    m_waterTexture.loadFromFile("water.png");
+    m_waterTexture.loadFromFile("Water.png");
     m_textureArray.create(16, 16);
 
     m_waterNormalTexture.wrapS(GL_REPEAT);

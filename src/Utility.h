@@ -57,5 +57,5 @@ void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue);
 bool initWindow(sf::Window* window);
 
 const Colour COLOUR_SKY_BLUE = {135, 206, 235, 255};
-const Colour COLOUR_SAND = {	235, 214, 135, 255};
+const Colour COLOUR_SAND = {235, 214, 135, 255};
 void setClearColour(Colour colour);

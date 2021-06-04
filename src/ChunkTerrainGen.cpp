@@ -88,8 +88,10 @@ namespace {
                     diff -= diff / 2;
                     height = WATER_LEVEL - diff - 1;
                 }
+                int h = (int)(height * island - 5.0f);
+                //h ^= h * 2;
 
-                heightMap[z * CHUNK_SIZE + x] = (int)(height * island - 5.0f);
+                heightMap[z * CHUNK_SIZE + x] = h;
             }
         }
 
