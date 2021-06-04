@@ -142,11 +142,13 @@ void Game::onUpdate()
         if (mesh.indicesCount > 0) {
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(mesh);
+            int verts = mesh.vertices.size();
+            int faces = verts / 4;
             if (mesh.chunkPosY >= WATER_LEVEL) {
-                m_chunkAboveWaterRenderList.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable());
+                m_chunkAboveWaterRenderList.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable(), verts, faces);
             }
             else {
-                m_chunkUnderWaterRenderList.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable());
+                m_chunkUnderWaterRenderList.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable(), verts, faces);
             }
             m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
         }
@@ -156,6 +158,18 @@ void Game::onUpdate()
     m_stats.chunksDrawn = 0;
     m_isUnderwater = m_cameraTransform.position.y < WATER_LEVEL;
 
+    m_stats.verticiesDrawn = 0;
+    m_stats.totalVertices = 0;
+    m_stats.blockFacesDrawn = 0;
+    m_stats.totalBlockFaces = 0;
+    for (auto& chunk : m_chunkAboveWaterRenderList) {
+        m_stats.totalVertices += chunk.numVerts;
+        m_stats.totalBlockFaces += chunk.numFaces;
+    }
+    for (auto& chunk : m_chunkUnderWaterRenderList) {
+        m_stats.totalVertices += chunk.numVerts;
+        m_stats.totalBlockFaces += chunk.numFaces;
+    }
 }
 
 void Game::onRender()
@@ -272,6 +286,9 @@ void Game::renderChunks(std::vector<ChunkRenderable>& renderList)
     for (auto& chunk : renderList) {
         if (m_frustum.chunkIsInFrustum(chunk.position)) {
             m_stats.chunksDrawn++;
+            m_stats.verticiesDrawn += chunk.numVerts;
+            m_stats.blockFacesDrawn += chunk.numFaces;
+            
             chunk.renderable.drawElements();
         }
     }
@@ -351,7 +368,8 @@ void Game::runTerrainThread()
                 std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
                 auto p = m_chunkReadyForMeshingQueue.front();
                 if (m_chunkMap.hasNeighbours(p)) {
-                    m_chunkMeshQueue.push(createChunkMesh(m_chunkMap.getChunk(p)));
+                    ChunkMesh mesh = createChunkMesh(m_chunkMap.getChunk(p));
+                    m_chunkMeshQueue.push(mesh);
                     m_chunkReadyForMeshingQueue.pop();
                 }
             }

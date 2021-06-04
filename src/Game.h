@@ -17,14 +17,18 @@
 class Keyboard;
 
 struct ChunkRenderable {
-    ChunkRenderable(const ChunkPosition& chunkPosition, Renderable chunkRenderable)
+    ChunkRenderable(const ChunkPosition& chunkPosition, Renderable chunkRenderable, uint16_t verts, uint16_t faces)
         : position(chunkPosition)
         , renderable(chunkRenderable)
+        , numVerts(verts)
+        , numFaces(faces)
     {
     }
 
     ChunkPosition position;
     Renderable renderable;
+    uint16_t numVerts;
+    uint16_t numFaces;
 };
 
 struct Sun {

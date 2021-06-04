@@ -12,6 +12,12 @@ struct GraphicsOptions;
 struct Stats {
     int totalChunks;
     int chunksDrawn;
+
+    int blockFacesDrawn;
+    int totalBlockFaces;
+
+    int verticiesDrawn;
+    int totalVertices;
 };
 
 class Game;

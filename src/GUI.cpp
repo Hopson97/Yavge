@@ -6,6 +6,19 @@
 #include <nuklear/nuklear_def.h>
 #include <nuklear/nuklear_sfml_gl3.h>
 #include "Game.h"
+#include "ChunkMesh.h"
+
+#include <iomanip>
+#include <locale>
+
+template<class T>
+std::string formatNumber(T value)
+{
+    std::stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << std::fixed << value;
+    return ss.str();
+}
 
 #define MAX_VERTEX_MEMORY 0x80000
 #define MAX_ELEMENT_MEMORY 0x80000
@@ -73,30 +86,44 @@ void guiEndFrame(void)
 
 void guiDebugScreen(const Transform& transform, const Stats& stats)
 {
-    if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 400, 180), window_flags)) {
-        nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Player Position: (%f %f %f)", transform.position[0], transform.position[1],
-                  transform.position[2]);
+    if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 300, 130), window_flags)) {
+        nk_layout_row_dynamic(ctx, 12, 1);
+        nk_labelf(ctx, NK_STATIC, "Player Position: (%.*f, %.*f, %.*f)", 2, transform.position[0], 2, transform.position[1],
+                  2, transform.position[2]);
 
-        nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Player Rotation: (%f %f %f)", transform.rotation[0], transform.rotation[1],
-                  transform.rotation[2]);
+        nk_labelf(ctx, NK_STATIC, "Player Rotation: (%.*f, %.*f, %.*f)",  2, transform.rotation[0],  2, transform.rotation[1],
+                   2, transform.rotation[2]);
 
-        nk_layout_row_dynamic(ctx, 25, 1);
 
         nk_labelf(ctx, NK_STATIC, "FPS: %f", fps);
         nk_labelf(ctx, NK_STATIC, "Frame Time: %f", frameTime);
+    }
+    nk_end(ctx);
+
+    if (nk_begin(ctx, "Draw Stats", nk_rect(320, 10, 450, 130), window_flags)) {
+        nk_layout_row_dynamic(ctx, 12, 1);
+        nk_labelf(ctx, NK_STATIC, "Note: These numbers include redraws (EG reflections).");
+        nk_layout_row_dynamic(ctx, 14, 1);
+        nk_labelf(ctx, NK_STATIC, "This means the *real* total values are a bit smaller.");
+        int verticiesDrawn = stats.verticiesDrawn;
+        int totalVertices = stats.totalVertices;
+        float verticiesDrawnMem = (float)sizeof(VoxelVertex) * stats.verticiesDrawn / (1024.0f * 1024.0f);
+        float totalVerticesMem = (float)sizeof(VoxelVertex) * stats.totalVertices / (1024.0f * 1024.0f);
+        int blockFacesDrawn = stats.blockFacesDrawn;
+        int totalBlockFaces = stats.totalBlockFaces;
 
         nk_labelf(ctx, NK_STATIC, "Chunks Drawn: %d / %d", stats.chunksDrawn, stats.totalChunks);
+        nk_labelf(ctx, NK_STATIC, "Vertices Drawn: %s / %s (%.*f / %.*f MB)", formatNumber(verticiesDrawn).c_str(), formatNumber(totalVertices).c_str(), 2, verticiesDrawnMem, 2, totalVerticesMem);
+        nk_labelf(ctx, NK_STATIC, "Faces Drawn: %s / %s", formatNumber(blockFacesDrawn).c_str(), formatNumber(totalBlockFaces).c_str());
     }
     nk_end(ctx);
 }
 
 void guiGraphicsOptions(GraphicsOptions* options)
 {
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 190, 300, 400), window_flags)) {
-        nk_layout_row_dynamic(ctx, 25, 1);
-        nk_labelf(ctx, NK_STATIC, "Press 'L' to unlock/lock mouse.");
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 150, 200, 200), window_flags)) {
+        nk_layout_row_dynamic(ctx, 14, 1);
+        nk_labelf(ctx, NK_STATIC, "Press 'L' to unlock mouse.");
         nk_labelf(ctx, NK_STATIC, "Press 'ESC' to exit.");
 
         nk_checkbox_label(ctx, "Reflection Enabled", &options->doWaterReflection);
@@ -114,8 +141,8 @@ void guiGraphicsOptions(GraphicsOptions* options)
 void guiResetWorld(Game* game, void(Game::*resetWorldFunc)(int))
 {
     static int worldSize = 8;
-    if (nk_begin(ctx, "World Reset", nk_rect(10, 600, 200, 200), window_flags)) {
-        nk_layout_row_dynamic(ctx, 25, 1);
+    if (nk_begin(ctx, "World Reset", nk_rect(10, 370, 200, 200), window_flags)) {
+        nk_layout_row_dynamic(ctx, 15, 1);
         nk_labelf(ctx, NK_STATIC, "World Size: %d", worldSize);
         nk_slider_int(ctx, 4, &worldSize, 40, 1);
         if(nk_button_label(ctx, "Reset World")) {
