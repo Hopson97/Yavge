@@ -35,17 +35,24 @@ Game::Game()
     m_waterTexture.loadFromFile("Water.png");
     m_textureArray.create(16, 16);
 
+    m_waterDistortTexture.wrapS(GL_REPEAT);
+    m_waterDistortTexture.wrapT(GL_REPEAT);
+    m_waterDistortTexture.minFilter(GL_NEAREST);
+    m_waterDistortTexture.magFilter(GL_NEAREST);
+    m_waterDistortTexture.loadFromFile("WaterDUDV.png");
+
     m_waterNormalTexture.wrapS(GL_REPEAT);
     m_waterNormalTexture.wrapT(GL_REPEAT);
     m_waterNormalTexture.minFilter(GL_NEAREST);
     m_waterNormalTexture.magFilter(GL_NEAREST);
-    m_waterNormalTexture.loadFromFile("WaterDUDV.png");
+    m_waterNormalTexture.loadFromFile("WaterNormal.jpg");
+
 
     initVoxelSystem(m_textureArray);
 
     auto c = CHUNK_SIZE * WORLD_SIZE / 2 - CHUNK_SIZE / 2;
     m_cameraTransform = { {c, CHUNK_SIZE * 1.5, c}, {0, 0, 0} };
-    m_sun.t.position.y = CHUNK_SIZE * 3;
+    m_sun.t.position.y = CHUNK_SIZE * 4;
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
@@ -132,17 +139,22 @@ void Game::onUpdate()
 
     m_stats.totalChunks = m_chunkUnderWaterRenderList.size() + m_chunkAboveWaterRenderList.size() * 2;
     m_stats.chunksDrawn = 0;
+    m_isUnderwater = m_cameraTransform.position.y < WATER_LEVEL;
+
 }
 
 void Game::onRender()
 {
+    auto& underwater = m_chunkUnderWaterRenderList;
+    auto& aboveWater = m_chunkAboveWaterRenderList;
+
     glEnable(GL_CLIP_DISTANCE0);
     float distance = (m_cameraTransform.position.y - WATER_LEVEL) * 2;
 
     m_cameraTransform.position.y -= distance;
     m_cameraTransform.rotation.x = -m_cameraTransform.rotation.x;
 
-    if (m_options.doWaterReflection) {
+    if (m_options.doWaterReflection && !m_isUnderwater) {
         m_reflectFramebuffer.bind();
 
         auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
@@ -154,7 +166,7 @@ void Game::onRender()
         renderScene(projectionViewMatrix);
 
         prepareChunkRender(projectionViewMatrix);
-        renderChunks(m_chunkAboveWaterRenderList);
+        renderChunks(aboveWater);
     }
 
     m_cameraTransform.position.y += distance;
@@ -165,12 +177,12 @@ void Game::onRender()
     m_frustum.update(projectionViewMatrix);
 
     if (m_options.doWaterRefraction) {
-        setClearColour(COLOUR_SAND);
+        setClearColour(COLOUR_SKY_BLUE);
         m_refractFramebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         prepareChunkRender(projectionViewMatrix);
-        renderChunks(m_chunkUnderWaterRenderList);
+        renderChunks(m_isUnderwater ? aboveWater : underwater);
     }
 
     setClearColour(COLOUR_SKY_BLUE);
@@ -181,7 +193,7 @@ void Game::onRender()
     renderScene(projectionViewMatrix);
 
     prepareChunkRender(projectionViewMatrix);
-    renderChunks(m_chunkAboveWaterRenderList);
+    renderChunks(m_isUnderwater ? underwater : aboveWater);
 }
 
 void Game::onGUI()
@@ -260,10 +272,12 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.set("lightPosition", m_sun.t.position);
     m_waterShader.set("eyePosition", m_cameraTransform.position);
     m_waterShader.set("useFresnal", m_options.doFresnel);
+    m_waterShader.set("isUnderwater", m_isUnderwater);
     m_waterShader.set("useDUDVMaps", m_options.useDistortMaps);
+    m_waterShader.set("useNormalMaps", m_options.useNormal);
     m_waterShader.set("time", m_timer.getElapsedTime().asSeconds());
 
-    if (m_options.doWaterReflection) {
+    if (m_options.doWaterReflection && !m_isUnderwater) {
         m_reflectTexture->bind(0);
     }
     else {
@@ -276,7 +290,8 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
         m_waterTexture.bind(1);
     }
 
-    m_waterNormalTexture.bind(2);
+    m_waterDistortTexture.bind(2);
+    m_waterNormalTexture.bind(3);
 
     glm::mat4 waterModel{1.0f};
     waterModel = glm::translate(waterModel, {0, WATER_LEVEL + 0.1, 0});

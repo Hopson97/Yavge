@@ -12,6 +12,7 @@ layout(binding = 0) uniform sampler2D reflectTexture;
 layout(binding = 1) uniform sampler2D refractTexture;
 
 layout(binding = 2) uniform sampler2D distortMap;
+layout(binding = 3) uniform sampler2D normalMap;
 
 uniform vec3 lightColour;
 uniform vec3 lightPosition;
@@ -19,6 +20,9 @@ uniform vec3 eyePosition;
 
 uniform bool useFresnal;
 uniform bool useDUDVMaps;
+uniform bool useNormalMaps;
+
+uniform bool isUnderwater;
 
 const float DISTORT_STRENGTH = 0.0045;
 
@@ -27,24 +31,47 @@ void main()
     vec2 deviceCoords = (passClipSpace.xy / passClipSpace.w) / 2.0 + 0.5;
     vec2 refractTexCoords = deviceCoords;
     vec2 reflectTexCoords = vec2(deviceCoords.x, 1-deviceCoords.y);
-
+    vec2 normalMapCoords = passTexCoords;
     if (useDUDVMaps) {
         float offset = passTime * 0.025;
         vec2 distort = texture(distortMap, vec2(passTexCoords.x + offset, passTexCoords.y)).rg * 0.1;
         distort = passTexCoords + vec2(distort.x, distort.y + offset);
         vec2 totalDistort = (texture(distortMap, distort).rg * 2.0 - 1.0) * DISTORT_STRENGTH;
 
+        normalMapCoords = distort;
         refractTexCoords += totalDistort;
         reflectTexCoords += totalDistort;
     }
 
+
+
     vec4 refractColour = texture(refractTexture, refractTexCoords);
-    vec4 reflectColour = texture(reflectTexture, reflectTexCoords);
+    vec4 reflectColour;
+    if (isUnderwater) {
+        reflectColour = vec4(1, 1, 1, 1);
+    } 
+    else {
+        reflectColour =  texture(reflectTexture, reflectTexCoords);
+    }
 
     // Calculate Lighting
     vec3 ambient = 0.1 * lightColour;
 
-    vec3 normal = normalize(passNormal);
+    vec3 normal;
+    
+    if (useNormalMaps) {
+        vec4 normalColourMap = texture(normalMap, normalMapCoords);
+        vec3 normalMapNormal = vec3(
+            normalColourMap.r - 2.0 + 1.0,
+            normalColourMap.g,
+            normalColourMap.b - 2.0 + 1.0
+        );
+        normal = normalize(normalMapNormal);
+    }
+    else {
+        normal = normalize(passNormal);
+    }
+    
     vec3 lightDirection = normalize(lightPosition - passFragPosition);
     vec3 eyeDirection = normalize(eyePosition - passFragPosition);
 
@@ -60,12 +87,7 @@ void main()
 
 
     // Calculate Fresnel Effect
-    float refractiveFactor = dot(eyeDirection, normal);
-    if (useFresnal) {
-        outColour = mix(reflectColour, refractColour, useFresnal ? refractiveFactor : 0.5);
-    }
-    else {
-        outColour = mix(reflectColour, refractColour, 0.5);
-    }
+    float refractiveFactor = isUnderwater ? 0.9 : dot(eyeDirection, normal);
+    outColour = mix(reflectColour, refractColour, useFresnal ? refractiveFactor : 0.5);
     outColour *= lighting;
 }

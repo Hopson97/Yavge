@@ -29,13 +29,14 @@ struct ChunkRenderable {
 
 struct Sun {
     Transform t;
-    int orbitRadius = CHUNK_SIZE * 4;
+    int orbitRadius = CHUNK_SIZE * 2;
     int orbitSpeed = 8000;
     void update(float time)
     {
         float rads = (2.0f * 3.14159f / orbitSpeed * time);
-        t.position.x = CHUNK_SIZE * 10 + sin(rads) * orbitRadius;
-        t.position.z = CHUNK_SIZE * 10 + cos(rads) * orbitRadius;
+        t.position.x = CHUNK_SIZE * 8 + sin(rads) * orbitRadius;
+        t.position.z = CHUNK_SIZE * 8 + cos(rads) * orbitRadius;
+        t.position.y = CHUNK_SIZE * 10;
     }
 };
 
@@ -70,6 +71,7 @@ class Game {
     VertexArray m_lightCube;
 
     Texture2D m_texture;
+    Texture2D m_waterDistortTexture;
     Texture2D m_waterNormalTexture;
     TextureArray2D m_textureArray;
 
@@ -109,4 +111,6 @@ class Game {
 
     GraphicsOptions m_options;
     Stats m_stats;
+
+    bool m_isUnderwater = false;
 };

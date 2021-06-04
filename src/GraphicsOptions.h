@@ -4,8 +4,11 @@ struct GraphicsOptions {
     int doWaterReflection = true;
     int doWaterRefraction = true;
 
-    int doFresnel = true;
-    int showPreviews = true;
+    int useDistortMaps = true;
+    int useNormal = true;
 
-    int useDistortMaps = false;
+    int doFresnel = true;
+
+    int showPreviews = false;
+
 };

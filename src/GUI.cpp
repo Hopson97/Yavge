@@ -99,8 +99,11 @@ void guiGraphicsOptions(GraphicsOptions* options)
         nk_checkbox_label(ctx, "Reflection Enabled", &options->doWaterReflection);
         nk_checkbox_label(ctx, "Refractions Enabled", &options->doWaterRefraction);
         nk_checkbox_label(ctx, "Fresnel Effect", &options->doFresnel);
-        nk_checkbox_label(ctx, "Show Previews", &options->showPreviews);
         nk_checkbox_label(ctx, "Water Distortian", &options->useDistortMaps);
+        nk_checkbox_label(ctx, "Water Normal", &options->useNormal);
+
+        nk_checkbox_label(ctx, "Show Previews", &options->showPreviews);
+
     }
     nk_end(ctx);
 }
