@@ -6,7 +6,13 @@ This was created using OpenGL 4.5 and the direct state access (DSA) API as oppos
 
 ## Building and Running
 
-Requires conan and cmake.
+Requires conan w/ bincrafters and cmake.
+
+```sh
+python3 -m pip install conan
+conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+conan remote update bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+```
 
 ### Linux
 
