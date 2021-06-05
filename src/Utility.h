@@ -2,6 +2,7 @@
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Window.hpp>
+#include <array>
 
 // Default window height and width
 #define WIDTH 1600

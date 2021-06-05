@@ -9,6 +9,7 @@
 #include "ChunkMesh.h"
 
 #include <iomanip>
+#include <sstream>
 #include <locale>
 
 template<class T>

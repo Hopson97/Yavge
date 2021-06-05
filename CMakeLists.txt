@@ -36,8 +36,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 #Set flags
 if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
   	target_compile_options(${PROJECT_NAME} PRIVATE 
-    	/W4 /WX)
+    	/W4)
 else()
   	target_compile_options(${PROJECT_NAME} PRIVATE 
 		-Wall -Wextra -pedantic -Werror)		
