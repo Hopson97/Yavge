@@ -2,7 +2,7 @@
 #include "Game.h"
 #include "Graphics/GLWrappers.h"
 #include "Utility.h"
-#include <SFML/Graphics/GpuPreference.hpp>
+#include <SFML/GpuPreference.hpp>
 
 int main()
 {
