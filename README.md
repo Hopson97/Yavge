@@ -51,6 +51,13 @@ In order of features added:
 
 ![Fresnel Effect](/Screenshots/FresnelEffect.png "Fresnel Effect")
 
+### Distort Maps (AKA DU/DV maps)
+
+![Distort Maps](/Screenshots/DUDVMaps.png "Distort Maps")
+
+### Normal Maps
+
+![Normal Maps](/Screenshots/NormalMaps.png "Normal Maps")
 
 ## Mistakes Were Made...
 
@@ -166,3 +173,26 @@ glBindTextureUnit(1, tex1);
 ```
 
 Which will then result in correct textures being used.
+
+### Mipmaps
+
+Before DSA, it was not really needed to specify number of mipmaps:
+
+```cpp
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+glGenerateMipmap(GL_TEXTURE_2D);  
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+// ... etc ...
+```
+
+With DSA, this must be specified in the second argument of glTextureStorage<>D
+
+For example:
+```cpp
+glTextureStorage2D(m_handle, 10, GL_RGBA8, width, height);
+glGenerateMipmap(GL_TEXTURE_2D);  
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+// ... etc ...
+```
+
+Which will then generate 10 mip maps levels. However, this number depends on the texture size. A smaller texture will not allow that many mip maps to be generated, and will instead render as black at far distances.
