@@ -10,5 +10,4 @@ struct GraphicsOptions {
     int doFresnel = true;
 
     int showPreviews = false;
-
 };

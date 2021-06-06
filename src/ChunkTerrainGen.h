@@ -3,4 +3,14 @@
 #include "Chunk.h"
 #include "Graphics/Mesh.h"
 
-std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize, int seed);
+struct TerrainGenOptions {
+    int octaves = 8;
+    float amplitude = 230;
+    float smoothness = 500;
+    float roughness = 0.58;
+    float offset = 0;
+    int seed;
+};
+
+std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize,
+                                              const TerrainGenOptions& TerrainGenOptions);

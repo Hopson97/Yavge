@@ -76,7 +76,7 @@ Mesh createCubeMesh(const glm::vec3& dimensions)
 
 namespace {
 
-    struct NoiseOptions {
+    struct TerrainGenOptions {
         float roughness;
         float smoothness;
         float amplitude;
@@ -85,7 +85,7 @@ namespace {
         float offset;
     };
 
-    float getNoiseAt(const glm::ivec2& position, int seed, NoiseOptions& options)
+    float getNoiseAt(const glm::ivec2& position, int seed, TerrainGenOptions& options)
     {
         float value = 0;
         float acc = 0;
@@ -111,14 +111,14 @@ Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat)
     int heightMapWidth = edgeVertices + 2;
     float fEdgeVertexCount = static_cast<float>(edgeVertices);
 
-    NoiseOptions terrainNoise;
+    TerrainGenOptions terrainNoise;
     terrainNoise.roughness = 0.7;
     terrainNoise.smoothness = 350.0f;
     terrainNoise.octaves = 5;
     terrainNoise.amplitude = 45.0f;
     terrainNoise.offset = -33;
 
-    NoiseOptions bumpNoise;
+    TerrainGenOptions bumpNoise;
     bumpNoise.roughness = 0.6;
     bumpNoise.smoothness = 50.0f;
     bumpNoise.octaves = 5;

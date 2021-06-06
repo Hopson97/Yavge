@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Chunk.h"
+#include "ChunkTerrainGen.h"
 #include "GUI.h"
 #include "Graphics/GLWrappers.h"
 #include "GraphicsOptions.h"
@@ -33,16 +34,22 @@ struct ChunkRenderable {
 
 struct Sun {
     Transform t;
-    int orbitRadius = CHUNK_SIZE;
-    int orbitSpeed = 24000;
+    int orbitSpeed = 25000;
     int center;
-    
-    void update(float time)
+
+    void update(int worldSize, float time)
     {
+        int c = worldSize * CHUNK_SIZE / 2 - CHUNK_SIZE / 2;
+        glm::vec3 wc = {c, 0, c};
+
+        int orbitRadius = CHUNK_SIZE * worldSize;
+
         float rads = (2.0f * 3.14159f / orbitSpeed * time);
         t.position.x = center + sin(rads) * orbitRadius;
         t.position.z = center + cos(rads) * orbitRadius;
-        t.position.y = CHUNK_SIZE * 5;
+        t.position.y = ((sin(time / 10000) + 1) / 2) * CHUNK_SIZE * 5;
+
+        t.rotation = wc - t.position;
     }
 };
 
@@ -122,4 +129,6 @@ class Game {
     int m_worldSize = 0;
 
     bool m_isUnderwater = false;
+
+    TerrainGenOptions m_terrainGenOptions;
 };

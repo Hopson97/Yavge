@@ -8,7 +8,9 @@
 #include <glm/glm.hpp>
 
 struct Transform;
+struct TerrainGenOptions;
 struct GraphicsOptions;
+
 struct Stats {
     int totalChunks;
     int chunksDrawn;
@@ -28,7 +30,7 @@ void guiShutdown();
 void guiBeginFrame();
 void guiProcessEvent(sf::Event& event);
 void guiEndFrame();
-void guiResetWorld(Game* game, void(Game::*resetWorldFunc)(int));
+void guiResetWorld(Game* game, void (Game::*resetWorldFunc)(int), TerrainGenOptions* noiseOps);
 
 void guiDebugScreen(const Transform& transform, const Stats& stats);
 

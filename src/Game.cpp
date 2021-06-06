@@ -4,7 +4,6 @@
 #include "Utility.h"
 #include "Voxels.h"
 
-
 Game::Game()
 {
     // clang-format off
@@ -12,8 +11,13 @@ Game::Game()
     m_voxelShader   .loadFromFile("VoxelVertex.glsl",   "VoxelFragment.glsl");
     m_waterShader   .loadFromFile("WaterVertex.glsl",   "WaterFragment.glsl");
     m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
-    m_lightCube .bufferMesh(createCubeMesh({5.5f, 5.5f, 5.5f}));
+    m_lightCube .bufferMesh(createCubeMesh({10.5f, 10.5f, 10.5f}));
 
+
+    std::srand(std::time(0));
+    m_terrainGenOptions.seed = std::rand() % 30000;
+
+    std::cout << "SEED: " << m_terrainGenOptions.seed << "\n";
     
     m_refractFramebuffer.create(WIDTH , HEIGHT);
     m_refractFramebuffer.addRenderBuffer();
@@ -71,8 +75,7 @@ void Game::resetWorld(int worldSize)
     m_sun.center = center;
 
     m_waterQuad.reset();
-    m_waterQuad.bufferMesh(createTerrainMesh(CHUNK_SIZE * worldSize, CHUNK_SIZE * 4, true));
-
+    m_waterQuad.bufferMesh(createTerrainMesh(CHUNK_SIZE * worldSize, CHUNK_SIZE * worldSize / 4, true));
 
     for (int x = 0; x < worldSize; x++) {
         for (int z = 0; z < worldSize; z++) {
@@ -80,12 +83,8 @@ void Game::resetWorld(int worldSize)
         }
     }
 
-    m_chunkMeshGenThread = std::thread([&]{
-        runTerrainThread();
-    });
-
+    m_chunkMeshGenThread = std::thread([&] { runTerrainThread(); });
 }
-
 
 Game::~Game()
 {
@@ -133,7 +132,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate()
 {
-    m_sun.update(m_timer.getElapsedTime().asMilliseconds());
+    m_sun.update(m_worldSize, m_timer.getElapsedTime().asMilliseconds());
     std::unique_lock<std::mutex> l(m_chunkVectorLock);
     while (!m_chunkMeshQueue.empty()) {
 
@@ -228,7 +227,7 @@ void Game::onGUI()
 {
     guiDebugScreen(m_cameraTransform, m_stats);
     guiGraphicsOptions(&m_options);
-    guiResetWorld(this, &Game::resetWorld);
+    guiResetWorld(this, &Game::resetWorld, &m_terrainGenOptions);
     if (m_options.showPreviews) {
         constexpr int SIZE = 400;
         if (m_options.doWaterRefraction) {
@@ -249,7 +248,7 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
     m_sceneShader.set("isLight", false);
     m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
-    m_sceneShader.set("lightPosition", m_sun.t.position);
+    m_sceneShader.set("lightDirection", {-0.2, -1, 0.3});
     m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
     m_texture.bind(0);
@@ -272,7 +271,7 @@ void Game::prepareChunkRender(const glm::mat4& projectionViewMatrix)
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
-    m_voxelShader.set("lightPosition", m_sun.t.position);
+    m_voxelShader.set("lightDirection", m_sun.t.rotation);
     m_voxelShader.set("eyePosition", m_cameraTransform.position);
     m_textureArray.bind();
 
@@ -288,7 +287,7 @@ void Game::renderChunks(std::vector<ChunkRenderable>& renderList)
             m_stats.chunksDrawn++;
             m_stats.verticiesDrawn += chunk.numVerts;
             m_stats.blockFacesDrawn += chunk.numFaces;
-            
+
             chunk.renderable.drawElements();
         }
     }
@@ -300,7 +299,7 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterShader.bind();
     m_waterShader.set("projectionViewMatrix", projectionViewMatrix);
     m_waterShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
-    m_waterShader.set("lightPosition", m_sun.t.position);
+    m_waterShader.set("lightDirection", {0, -1, 0});
     m_waterShader.set("eyePosition", m_cameraTransform.position);
     m_waterShader.set("useFresnal", m_options.doFresnel);
     m_waterShader.set("isUnderwater", m_isUnderwater);
@@ -343,10 +342,7 @@ void Game::runTerrainThread()
 
     // 27949 -> VIBESVIBESVIBESVIBESVIBESVIBES
 
-    std::srand(std::time(0));
-    int seed = std::rand() % 30000;
 
-    std::cout << "SEED: " << seed << "\n";
 
     while (m_isRunning) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
@@ -356,7 +352,7 @@ void Game::runTerrainThread()
             if (!m_chunkUpdateQueue.empty()) {
                 ChunkPosition& p = m_chunkUpdateQueue.front();
                 m_chunkUpdateQueue.pop();
-                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, m_worldSize, seed);
+                auto pos = createChunkTerrain(m_chunkMap, p.x, p.z, m_worldSize, m_terrainGenOptions);
                 for (const auto& p : pos) {
                     m_chunkReadyForMeshingQueue.push(p);
                 }

@@ -8,14 +8,6 @@
 #include <iostream>
 
 namespace {
-    struct NoiseOptions {
-        int octaves;
-        float amplitude;
-        float smoothness;
-        float roughness;
-        float offset;
-    };
-
     // THANKS! Karasa and K.jpg for help with this algo
     float rounded(const glm::vec2& coord)
     {
@@ -24,8 +16,7 @@ namespace {
         return b * 0.9f;
     }
 
-    float getNoiseAt(const glm::vec2& voxelPosition, const glm::vec2& chunkPosition, const NoiseOptions& options,
-                     int seed)
+    float getNoiseAt(const glm::vec2& voxelPosition, const glm::vec2& chunkPosition, const TerrainGenOptions& options)
     {
         // Get voxel X/Z positions
         float voxelX = voxelPosition.x + chunkPosition.x * CHUNK_SIZE;
@@ -41,7 +32,7 @@ namespace {
             float x = voxelX * frequency / options.smoothness;
             float y = voxelZ * frequency / options.smoothness;
 
-            float noise = glm::simplex(glm::vec3{seed + x, seed + y, seed});
+            float noise = glm::simplex(glm::vec3{options.seed + x, options.seed + y, options.seed});
             noise = (noise + 1.0f) / 2.0f;
             value += noise * amplitude;
             accumulatedAmps += amplitude;
@@ -49,18 +40,11 @@ namespace {
         return value / accumulatedAmps;
     }
 
-    std::array<int, CHUNK_AREA> createChunkHeightMap(const ChunkPosition& position, int worldSize, int seed)
+    std::array<int, CHUNK_AREA> createChunkHeightMap(const ChunkPosition& position, int worldSize, const TerrainGenOptions& firstNoise)
     {
         const float WOLRD_SIZE = static_cast<float>(worldSize) * CHUNK_SIZE;
 
-        NoiseOptions firstNoise;
-        firstNoise.amplitude = 230;
-        firstNoise.octaves = 8;
-        firstNoise.smoothness = 500.f;
-        firstNoise.roughness = 0.58f;
-        firstNoise.offset = 0;
-
-        NoiseOptions secondNoise;
+        TerrainGenOptions secondNoise;
         secondNoise.amplitude = 20;
         secondNoise.octaves = 4;
         secondNoise.smoothness = 200;
@@ -77,8 +61,8 @@ namespace {
 
                 glm::vec2 coord = (glm::vec2{bx, bz} - WOLRD_SIZE / 2.0f) / WOLRD_SIZE * 2.0f;
 
-                float noise = getNoiseAt({x, z}, chunkXZ, firstNoise, seed);
-                float noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise, seed);
+                float noise = getNoiseAt({x, z}, chunkXZ, firstNoise);
+                float noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise);
                 float island = rounded(coord) * 1.25;
                 float result = noise * noise2;
                 float height = result * (firstNoise.amplitude + firstNoise.offset);
@@ -89,7 +73,7 @@ namespace {
                     height = WATER_LEVEL - diff - 1;
                 }
                 int h = (int)(height * island - 5.0f);
-                //h ^= h * 2;
+                // h ^= h * 2;
 
                 heightMap[z * CHUNK_SIZE + x] = h;
             }
@@ -98,9 +82,9 @@ namespace {
         return heightMap;
     }
 
-    std::array<int, CHUNK_AREA> createBiomeMap(const ChunkPosition& position, int seed)
+    std::array<int, CHUNK_AREA> createBiomeMap(const ChunkPosition& position)
     {
-        NoiseOptions biomeMapNoise;
+        TerrainGenOptions biomeMapNoise;
         biomeMapNoise.amplitude = 120;
         biomeMapNoise.octaves = 4;
         biomeMapNoise.smoothness = 200.f;
@@ -111,7 +95,7 @@ namespace {
         glm::vec2 chunkXZ = {position.x, position.z};
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
-                auto noise = getNoiseAt({x, z}, chunkXZ, biomeMapNoise, seed);
+                auto noise = getNoiseAt({x, z}, chunkXZ, biomeMapNoise);
                 int height = static_cast<int>(noise * biomeMapNoise.amplitude);
                 biomeMap[z * CHUNK_SIZE + x] = height;
             }
@@ -160,13 +144,14 @@ namespace {
 
 } // namespace
 
-std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize, int seed)
+std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize,
+                                              const TerrainGenOptions& TerrainGenOptions)
 {
     std::vector<ChunkPosition> positions;
     ChunkPosition position{chunkX, 0, chunkZ};
 
-    auto heightMap = createChunkHeightMap(position, worldSize, seed);
-    auto biomeMap = createBiomeMap(position, 9876);
+    auto heightMap = createChunkHeightMap(position, worldSize, TerrainGenOptions);
+    auto biomeMap = createBiomeMap(position);
     int maxHeight = *std::max_element(heightMap.cbegin(), heightMap.cend());
     for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
         Chunk& chunk = chunkmap.addChunk({chunkX, y, chunkZ});

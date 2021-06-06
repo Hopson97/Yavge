@@ -116,7 +116,7 @@ GLuint Shader::getUniformLocation(const char* name)
     auto itr = m_uniformLocations.find(name);
     if (itr == m_uniformLocations.cend()) {
         GLint location = glGetUniformLocation(m_program, name);
-        //std::cout << "Getting uniform location: " << name << std::endl;
+        // std::cout << "Getting uniform location: " << name << std::endl;
         assert(location != -1);
         m_uniformLocations.emplace(name, location);
     }

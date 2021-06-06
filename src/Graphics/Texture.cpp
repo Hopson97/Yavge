@@ -128,14 +128,13 @@ void TextureArray2D::create(GLuint textureDims, GLuint textureCount)
 {
     m_textureDims = textureDims;
     m_maxTextures = textureCount;
-    
+
     glTextureStorage3D(m_handle, 1, GL_RGBA8, textureDims, textureDims, textureCount);
 
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
 }
 
 GLuint TextureArray2D::addTexture(const char* file)
