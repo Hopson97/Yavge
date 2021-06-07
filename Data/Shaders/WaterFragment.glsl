@@ -61,12 +61,10 @@ void main()
     
     if (useNormalMaps) {
         vec4 normalColourMap = texture(normalMap, normalMapCoords);
-        vec3 normalMapNormal = vec3(
-            normalColourMap.r - 2.0 + 1.0,
-            normalColourMap.g,
-            normalColourMap.b - 2.0 + 1.0
-        );
-        normal = normalize(normalMapNormal);
+        normal = normalize(vec3(normalColourMap.r * 2.0 - 1.0,
+            normalColourMap.b * 2.0 - 1.0,
+            normalColourMap.g * 2.0 - 1.0
+        ));
     }
     else {
         normal = normalize(passNormal);
