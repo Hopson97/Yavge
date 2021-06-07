@@ -192,7 +192,7 @@ void Game::onRender()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderScene(projectionViewMatrix);
         prepareChunkRender(projectionViewMatrix);
-        renderChunks(aboveWater);
+        renderChunks(aboveWater, false);
     }
 
     m_cameraTransform.position.y += distance;
@@ -208,7 +208,7 @@ void Game::onRender()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         prepareChunkRender(projectionViewMatrix);
-        renderChunks(m_isUnderwater ? aboveWater : underwater);
+        renderChunks(m_isUnderwater ? aboveWater : underwater, true);
     }
 
     setClearColour(COLOUR_SKY_BLUE);
@@ -219,7 +219,7 @@ void Game::onRender()
     renderScene(projectionViewMatrix);
 
     prepareChunkRender(projectionViewMatrix);
-    renderChunks(m_isUnderwater ? underwater : aboveWater);
+    renderChunks(m_isUnderwater ? underwater : aboveWater, true);
 }
 
 void Game::onGUI()
@@ -257,7 +257,7 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     m_sceneShader.set("modelMatrix", terrainModel);
     m_terrain.getRendable().drawElements();
 
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     auto lightModel = createModelMatrix(m_sun.t);
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);
@@ -279,15 +279,16 @@ void Game::prepareChunkRender(const glm::mat4& projectionViewMatrix)
     m_voxelShader.set("modelMatrix", voxelModel);
 }
 
-void Game::renderChunks(std::vector<ChunkRenderable>& renderList)
+void Game::renderChunks(std::vector<ChunkRenderable>& renderList, bool count)
 {
     for (auto& chunk : renderList) {
         if (m_frustum.chunkIsInFrustum(chunk.position)) {
-            m_stats.chunksDrawn++;
-            m_stats.verticiesDrawn += chunk.numVerts;
-            m_stats.blockFacesDrawn += chunk.numFaces;
-
             chunk.renderable.drawElements();
+            if (count) {
+                m_stats.chunksDrawn++;
+                m_stats.verticiesDrawn += chunk.numVerts;
+                m_stats.blockFacesDrawn += chunk.numFaces;
+            }
         }
     }
 }
@@ -361,8 +362,9 @@ void Game::runTerrainThread()
                 std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
                 auto p = m_chunkReadyForMeshingQueue.front();
                 if (m_chunkMap.hasNeighbours(p)) {
-                    // ChunkMesh mesh = createChunkMesh(m_chunkMap.getChunk(p));
-                    ChunkMesh mesh = createGreedyChunkMesh(m_chunkMap.getChunk(p));
+                    ChunkMesh mesh = m_terrainGenOptions.useGreedyMeshing
+                                         ? createGreedyChunkMesh(m_chunkMap.getChunk(p))
+                                         : createChunkMesh(m_chunkMap.getChunk(p));
                     m_chunkMeshQueue.push(mesh);
                     m_chunkReadyForMeshingQueue.pop();
                 }

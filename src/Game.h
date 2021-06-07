@@ -73,7 +73,7 @@ class Game {
     void renderWater(const glm::mat4& projectionViewMatrix);
 
     void prepareChunkRender(const glm::mat4& projectionViewMatrix);
-    void renderChunks(std::vector<ChunkRenderable>& renderList);
+    void renderChunks(std::vector<ChunkRenderable>& renderList, bool count);
 
     void runTerrainThread();
 

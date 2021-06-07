@@ -107,9 +107,8 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
 
     if (nk_begin(ctx, "Draw Stats", nk_rect(320, 10, 450, 130), window_flags)) {
         nk_layout_row_dynamic(ctx, 12, 1);
-        nk_labelf(ctx, NK_STATIC, "Note: These numbers include redraws (EG reflections).");
+        nk_labelf(ctx, NK_STATIC, "Note: These numbers DO NOT include redraws (EG reflections).");
         nk_layout_row_dynamic(ctx, 14, 1);
-        nk_labelf(ctx, NK_STATIC, "This means the *real* total values are a bit smaller.");
         int verticiesDrawn = stats.verticiesDrawn;
         int totalVertices = stats.totalVertices;
         float verticiesDrawnMem = (float)sizeof(VoxelVertex) * stats.verticiesDrawn / (1024.0f * 1024.0f);
@@ -167,6 +166,10 @@ void guiResetWorld(Game* game, void (Game::*resetWorldFunc)(int), TerrainGenOpti
 
         nk_labelf(ctx, NK_STATIC, "Height Offset: %.*f", 2, nops->offset);
         nk_slider_float(ctx, -100, &nops->offset, 100, 1);
+
+        nk_layout_row_dynamic(ctx, 25, 1);
+
+        nk_checkbox_label(ctx, "Greedy Meshing", &nops->useGreedyMeshing);
 
         nk_layout_row_dynamic(ctx, 25, 2);
         nk_labelf(ctx, NK_STATIC, "Seed: %d", nops->seed);
