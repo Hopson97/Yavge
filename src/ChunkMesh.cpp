@@ -108,6 +108,13 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
     return mesh;
 }
 
+const std::array<glm::vec2, 4> greedyTexCoords = {
+    v2{1.0f, 1.0f},
+    v2{1.0f, 0.0f},
+    v2{0.0f, 0.0f},
+    v2{0.0f, 1.0f},
+};
+
 // Ported from https://eddieabbondanz.io/post/voxel/greedy-mesh/
 // Consider a 3D vector as an array rather than 3 seperate components
 // and this becomes a lot more clear
@@ -180,7 +187,9 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
 
                     /////////////////////////////////////////////////////
                     /////////////////////////////////////////////////////
-                    /////////////////////////////////////////////////////
+                    ////
+                    ////  vvvv   NEED TO WORK OUT HOW THIS WORKS  vvvv
+                    ////
                     /////////////////////////////////////////////////////
                     /////////////////////////////////////////////////////
                     for (currPos = start, currPos[sweepDirB]++;
@@ -213,36 +222,43 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                     quadSize[sweepDirA] = currPos[sweepDirA] - start[sweepDirA];
                     /////////////////////////////////////////////////////
                     /////////////////////////////////////////////////////
+                    ////
+                    //// ^^^^   NEED TO WORK OUT HOW THAT WORKS  ^^^^^
+                    ////
                     /////////////////////////////////////////////////////
                     /////////////////////////////////////////////////////
 
-                    glm::ivec3 w{0}; //= quadSize;
-                    glm::ivec3 h{0};//sweepDir = quadSize;
-                    glm::ivec3 o = start;
+                    // Calculate the "width" and "height"
+                    glm::ivec3 width{0};
+                    glm::ivec3 height{0};
+                    glm::ivec3 offset = p * CHUNK_SIZE + start;
 
-                    w[sweepDirA] = quadSize[sweepDirA];
-                    h[sweepDirB] = quadSize[sweepDirB];
-                    o[sliceDir] += isBackFace ? 0 : 1;
+                    // The components of the width and height are the sweep planes
+                    width[sweepDirA] = quadSize[sweepDirA];
+                    height[sweepDirB] = quadSize[sweepDirB];
 
-                    VoxelVertex v1, v2, v3, v4;
-                    v1.position = p * CHUNK_SIZE + o;
-                    v2.position = p * CHUNK_SIZE + o + w;
-                    v3.position = p * CHUNK_SIZE + o + w + h;
-                    v4.position = p * CHUNK_SIZE + o + h;
+                    // The "offset" is the layer within this chunk the voxel is
+                    offset[sliceDir] += isBackFace ? 0 : 1;
 
-                    v1.textureCoord = {textureCoords[0].x, textureCoords[0].y, 1};
-                    v2.textureCoord = {textureCoords[1].x, textureCoords[1].y, 1};
-                    v3.textureCoord = {textureCoords[2].x, textureCoords[2].y, 1};
-                    v4.textureCoord = {textureCoords[3].x, textureCoords[3].y, 1};
+                    // Calculate the positon
+                    VoxelVertex verticies[4];
+                    verticies[0].position = offset;
+                    verticies[1].position = offset + width;
+                    verticies[2].position = offset + width + height;
+                    verticies[3].position = offset + height;
 
-                    v1.normal = {0, 1, 0};
-                    v2.normal = {0, 1, 0};
-                    v3.normal = {0, 1, 0};
-                    v4.normal = {0, 1, 0};
-                    mesh.vertices.push_back(v1);
-                    mesh.vertices.push_back(v2);
-                    mesh.vertices.push_back(v3);
-                    mesh.vertices.push_back(v4);
+                    // Calulate the texture coords and add to the mesh
+                    auto quadWidth = quadSize[sweepDirB];
+                    auto quadHeight = quadSize[sweepDirA];
+                    GLuint texture = getVoxelTexture(thisVoxel, sliceDir, isBackFace);
+                    for (int i = 0; i < 4; i++) {
+                        auto s = greedyTexCoords[i].s * quadWidth;
+                        auto t = greedyTexCoords[i].t * quadHeight;
+                        verticies[i].textureCoord = {s, t, texture};
+                        verticies[i].normal = {0, 1, 0};
+
+                        mesh.vertices.push_back(verticies[i]);
+                    }
 
                     mesh.indices.push_back(mesh.indicesCount);
                     mesh.indices.push_back(mesh.indicesCount + 1);

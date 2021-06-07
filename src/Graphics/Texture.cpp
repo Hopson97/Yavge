@@ -82,7 +82,7 @@ void Texture2D::useDefaultFilters()
     glGenerateTextureMipmap(m_handle);
 
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -131,8 +131,8 @@ void TextureArray2D::create(GLuint textureDims, GLuint textureCount)
 
     glTextureStorage3D(m_handle, 1, GL_RGBA8, textureDims, textureDims, textureCount);
 
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }

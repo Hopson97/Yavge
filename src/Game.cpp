@@ -257,7 +257,7 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     m_sceneShader.set("modelMatrix", terrainModel);
     m_terrain.getRendable().drawElements();
 
-    //glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     auto lightModel = createModelMatrix(m_sun.t);
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);

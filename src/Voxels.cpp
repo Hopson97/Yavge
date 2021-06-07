@@ -33,3 +33,19 @@ bool isVoxelSolid(uint16_t i)
 {
     return i > VoxelType::WATER;
 }
+
+GLuint getVoxelTexture(uint16_t id, int direction, bool isBackFace)
+{
+    const Voxel& d = getVoxelType((VoxelType)id);
+    switch (direction) {
+        case 0:
+        case 2:
+            return d.textureSide;
+
+        case 1:
+            return isBackFace ? d.textureBottom : d.textureTop;
+
+        default:
+            return 0;
+    }
+}

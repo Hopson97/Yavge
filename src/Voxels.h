@@ -37,3 +37,5 @@ void initVoxelSystem(TextureArray2D& textureArray);
 const Voxel& getVoxelType(VoxelType type);
 
 bool isVoxelSolid(uint16_t i);
+
+GLuint getVoxelTexture(uint16_t id, int direction, bool isBackFace);
