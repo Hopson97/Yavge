@@ -1,5 +1,5 @@
 #include "Chunk.h"
-
+#include "Voxels.h"
 namespace {
     int toLocalVoxelIndex(const VoxelPosition& position)
     {
@@ -97,6 +97,28 @@ VoxelID Chunk::qGetVoxel(const VoxelPosition& voxelPosition) const
     return m_voxels[toLocalVoxelIndex(voxelPosition)];
 }
 
+bool Chunk::isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const
+{
+    // Convert the block position to the adjacent voxel pos that is currently
+    // being looked at
+    pos[axis] += isBackFace ? -1 : 1;
+
+    return !isVoxelSolid(getVoxel(pos));
+}
+
+bool Chunk::compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFace) const
+{
+    auto voxelA = getVoxel(a);
+    auto voxelB = getVoxel(b);
+    return voxelA == voxelB && isVoxelSolid(voxelB) && isFaceVisible(b, dir, isBackFace);
+}
+
+///
+///
+///     CHUNK MAP
+///
+///
+///
 void ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid)
 {
     auto chunkPosition = toChunkPosition(voxelPosition);

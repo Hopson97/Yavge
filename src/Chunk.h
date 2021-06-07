@@ -45,6 +45,10 @@ class Chunk {
     {
         return m_position;
     };
+
+    bool isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const;
+    bool compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFace) const;
+
     bool hasTerrain = false;
 
   private:

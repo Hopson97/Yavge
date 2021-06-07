@@ -35,3 +35,5 @@ struct Voxel {
 
 void initVoxelSystem(TextureArray2D& textureArray);
 const Voxel& getVoxelType(VoxelType type);
+
+bool isVoxelSolid(uint16_t i);

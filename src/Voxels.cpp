@@ -29,9 +29,7 @@ const Voxel& getVoxelType(VoxelType type)
     return voxels[type];
 }
 
-/*
-
-    AIR = 0,
-    GRASS = 1,
-    STONE = 2,
-    WATER = 3,*/
+bool isVoxelSolid(uint16_t i)
+{
+    return i > VoxelType::WATER;
+}

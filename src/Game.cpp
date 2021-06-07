@@ -257,7 +257,7 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     m_sceneShader.set("modelMatrix", terrainModel);
     m_terrain.getRendable().drawElements();
 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     auto lightModel = createModelMatrix(m_sun.t);
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);
@@ -361,7 +361,8 @@ void Game::runTerrainThread()
                 std::unique_lock<std::mutex> cvl(m_chunkVectorLock);
                 auto p = m_chunkReadyForMeshingQueue.front();
                 if (m_chunkMap.hasNeighbours(p)) {
-                    ChunkMesh mesh = createChunkMesh(m_chunkMap.getChunk(p));
+                    // ChunkMesh mesh = createChunkMesh(m_chunkMap.getChunk(p));
+                    ChunkMesh mesh = createGreedyChunkMesh(m_chunkMap.getChunk(p));
                     m_chunkMeshQueue.push(mesh);
                     m_chunkReadyForMeshingQueue.pop();
                 }

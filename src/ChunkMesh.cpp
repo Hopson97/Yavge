@@ -1,6 +1,7 @@
 #include "ChunkMesh.h"
 
 #include "Voxels.h"
+#include <iostream>
 namespace {
     using v3 = glm::ivec3;
     using v2 = glm::vec2;
@@ -56,6 +57,11 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
     mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
     mesh.chunkPos = chunk.position();
 
+    static int yeeet = false;
+    if (yeeet) {
+        return mesh;
+    }
+    yeeet = true;
     for (int y = 0; y < CHUNK_SIZE; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -102,6 +108,162 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
     return mesh;
 }
 
+// Ported from https://eddieabbondanz.io/post/voxel/greedy-mesh/
+// Consider a 3D vector as an array rather than 3 seperate components
+// and this becomes a lot more clear
+// eg If you have array with glm::vec3 = {11, 29, 23};, X is 1, Y is 2, and Z is 3
+// OR thinking in arrays, [0] = 11, [1] = 29, and [2] = 23
+// By working out which component of the vector needs to be sweeped through, the
+// algorithm is able to be used for multiple directions without changing
+ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
+{
+    ChunkMesh mesh;
+    auto p = chunk.position();
+    mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
+    mesh.chunkPos = chunk.position();
+
+    // For each slice, a mask is created to determine if a block face has already been visited
+    std::array<bool, CHUNK_AREA> mask;
+    auto maskIdx = [](int x, int y) { return y * CHUNK_SIZE + x; };
+
+    // Goes through all 6 axis eg X, -X, Y, -Y, Z, and -Z
+    for (int faceAxis = 0; faceAxis < 6; faceAxis++) {
+        // For -X, -Y, and -Z, this is true, else is false
+        bool isBackFace = faceAxis > 2;
+
+        // X, Y, or Z component of the vector. This is the "slice" component of the chunk
+        // This says which layer the
+        int sliceDir = faceAxis % 3;
+
+        // These are the other two components of the vector complemening "direction"
+        // that are used to sweep across the indiidual planes/slices
+        // Eg if the "slice direction" is 0 (or X),
+        // then these will be 1 and 2, (or Y and Z) etc
+        int sweepDirA = (sliceDir + 1) % 3;
+        int sweepDirB = (sliceDir + 2) % 3;
+
+        // The "working" location within the chunk
+        VoxelPosition start{0};
+        VoxelPosition end{0};
+
+        // iterate the chunk layers
+        for (start[sliceDir] = 0; start[sliceDir] < CHUNK_SIZE; start[sliceDir]++) {
+
+            // Reset the mask for each layer that is visted
+            mask = {false};
+
+            // Iterate the voxels of this layer
+            for (start[sweepDirA] = 0; start[sweepDirA] < CHUNK_SIZE; start[sweepDirA]++) {
+                for (start[sweepDirB] = 0; start[sweepDirB] < CHUNK_SIZE; start[sweepDirB]++) {
+
+                    // Get the voxel at this location in the chunk
+                    uint16_t thisVoxel = chunk.getVoxel(start);
+
+                    // Skip this voxel in the working direction if its working face is not visible or has already been
+                    // merged
+                    if (mask.at(maskIdx(start[sweepDirA], start[sweepDirB])) || !isVoxelSolid(thisVoxel) ||
+                        !chunk.isFaceVisible(start, sliceDir, isBackFace))
+                        continue;
+
+                    // At this point a SINGLE voxel face has been found.
+                    // Adajacent voxel faces are then combined into this one by:
+                    //  1. Calculate the width of this voxel section
+                    //  2. Calculate the height of this voxel section
+                    //  3. Create 4 verticies, and add them to the chunk mesh
+
+                    VoxelPosition currPos = start;
+                    glm::ivec3 quadSize{0};
+
+                    // Work out how "wide" the section is by going throuugh a single row of voxels
+                    // and looking at the next voxel along to see if it is the same type of voxel
+                    // and has a visible face
+
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    for (currPos = start, currPos[sweepDirB]++;
+                         currPos[sweepDirB] < CHUNK_SIZE && chunk.compareStep(start, currPos, sliceDir, isBackFace) &&
+                         !mask.at(maskIdx(currPos[sweepDirA], currPos[sweepDirB]));
+                         currPos[sweepDirB]++) {
+                    }
+                    quadSize[sweepDirB] = currPos[sweepDirB] - start[sweepDirB];
+
+                    // Figure out the height, then save it
+                    for (currPos = start, currPos[sweepDirA]++;
+                         currPos[sweepDirA] < CHUNK_SIZE && chunk.compareStep(start, currPos, sliceDir, isBackFace) &&
+                         !mask.at(maskIdx(currPos[sweepDirA], currPos[sweepDirB]));
+                         currPos[sweepDirA]++) {
+                        for (currPos[sweepDirB] = start[sweepDirB];
+                             currPos[sweepDirB] < CHUNK_SIZE &&
+                             chunk.compareStep(start, currPos, sliceDir, isBackFace) &&
+                             !mask.at(maskIdx(currPos[sweepDirA], currPos[sweepDirB]));
+                             currPos[sweepDirB]++) {
+                        }
+
+                        // If we didn't reach the end then its not a good add.
+                        if (currPos[sweepDirB] - start[sweepDirB] < quadSize[sweepDirB]) {
+                            break;
+                        }
+                        else {
+                            currPos[sweepDirB] = start[sweepDirB];
+                        }
+                    }
+                    quadSize[sweepDirA] = currPos[sweepDirA] - start[sweepDirA];
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////
+
+                    glm::ivec3 w{0}; //= quadSize;
+                    glm::ivec3 h{0};//sweepDir = quadSize;
+                    glm::ivec3 o = start;
+
+                    w[sweepDirA] = quadSize[sweepDirA];
+                    h[sweepDirB] = quadSize[sweepDirB];
+                    o[sliceDir] += isBackFace ? 0 : 1;
+
+                    VoxelVertex v1, v2, v3, v4;
+                    v1.position = p * CHUNK_SIZE + o;
+                    v2.position = p * CHUNK_SIZE + o + w;
+                    v3.position = p * CHUNK_SIZE + o + w + h;
+                    v4.position = p * CHUNK_SIZE + o + h;
+
+                    v1.textureCoord = {textureCoords[0].x, textureCoords[0].y, 1};
+                    v2.textureCoord = {textureCoords[1].x, textureCoords[1].y, 1};
+                    v3.textureCoord = {textureCoords[2].x, textureCoords[2].y, 1};
+                    v4.textureCoord = {textureCoords[3].x, textureCoords[3].y, 1};
+
+                    v1.normal = {0, 1, 0};
+                    v2.normal = {0, 1, 0};
+                    v3.normal = {0, 1, 0};
+                    v4.normal = {0, 1, 0};
+                    mesh.vertices.push_back(v1);
+                    mesh.vertices.push_back(v2);
+                    mesh.vertices.push_back(v3);
+                    mesh.vertices.push_back(v4);
+
+                    mesh.indices.push_back(mesh.indicesCount);
+                    mesh.indices.push_back(mesh.indicesCount + 1);
+                    mesh.indices.push_back(mesh.indicesCount + 2);
+                    mesh.indices.push_back(mesh.indicesCount + 2);
+                    mesh.indices.push_back(mesh.indicesCount + 3);
+                    mesh.indices.push_back(mesh.indicesCount);
+                    mesh.indicesCount += 4;
+
+                    // Finally, add the face to the mask so they aren't repeated
+                    for (int y = 0; y < quadSize[sweepDirA]; y++) {
+                        for (int x = 0; x < quadSize[sweepDirB]; x++) {
+                            mask.at(maskIdx(start[sweepDirA] + y, start[sweepDirB] + x)) = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return mesh;
+}
 ChunkMesh createGrassCubeMesh()
 {
     ChunkMesh mesh;
