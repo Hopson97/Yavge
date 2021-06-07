@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Chunk.h"
-#include "ChunkTerrainGen.h"
+#include "Chunks/Chunk.h"
+#include "Chunks/ChunkTerrainGen.h"
 #include "GUI.h"
 #include "Graphics/GLWrappers.h"
 #include "GraphicsOptions.h"

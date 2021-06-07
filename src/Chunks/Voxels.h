@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Graphics/Shader.h"
+#include "../Graphics/Shader.h"
 #include <cstdint>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+
 class TextureArray2D;
 
 enum VoxelType : VoxelID {

@@ -1,8 +1,8 @@
 #include "Game.h"
 
-#include "ChunkTerrainGen.h"
+#include "Chunks/ChunkTerrainGen.h"
 #include "Utility.h"
-#include "Voxels.h"
+#include "Chunks/Voxels.h"
 
 Game::Game()
 {

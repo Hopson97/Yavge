@@ -1,7 +1,7 @@
 #include "Voxels.h"
 
-#include "Graphics/Texture.h"
-#include "Utility.h"
+#include "../Graphics/Texture.h"
+#include "../Utility.h"
 #include <array>
 #include <iostream>
 

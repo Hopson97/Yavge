@@ -18,10 +18,10 @@ add_executable(${PROJECT_NAME}
     src/Utility.cpp
     src/Game.cpp
 
-    src/Chunk.cpp
-    src/ChunkTerrainGen.cpp
-    src/ChunkMesh.cpp
-    src/Voxels.cpp
+    src/Chunks/Chunk.cpp
+    src/Chunks/ChunkTerrainGen.cpp
+    src/Chunks/ChunkMesh.cpp
+    src/Chunks/Voxels.cpp
 
     src/Graphics/Framebuffer.cpp
     src/Graphics/Mesh.cpp

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Chunk.h"
-#include "Graphics/Mesh.h"
 
 struct TerrainGenOptions {
     int octaves = 8;

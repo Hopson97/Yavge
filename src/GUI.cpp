@@ -1,7 +1,7 @@
 #include "GUI.h"
 
-#include "ChunkMesh.h"
-#include "ChunkTerrainGen.h"
+#include "Chunks/ChunkMesh.h"
+#include "Chunks/ChunkTerrainGen.h"
 #include "Game.h"
 #include "GraphicsOptions.h"
 #include "Maths.h"

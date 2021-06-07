@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Chunk.h"
+#include "Chunks/Chunk.h"
 
 struct Transform {
     glm::vec3 position{0.0f};

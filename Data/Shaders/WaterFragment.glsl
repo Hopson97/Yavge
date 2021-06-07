@@ -24,7 +24,7 @@ uniform bool useNormalMaps;
 
 uniform bool isUnderwater;
 
-const float DISTORT_STRENGTH = 0.0045;
+const float DISTORT_STRENGTH = 0.0075;
 
 void main()
 {
@@ -85,7 +85,7 @@ void main()
 
 
     // Calculate Fresnel Effect
-    float refractiveFactor = isUnderwater ? 0.9 : dot(eyeDirection, normal);
+    float refractiveFactor = isUnderwater ? 0.9 : dot(eyeDirection, vec3(0, 1, 0));
     outColour = mix(reflectColour, refractColour, useFresnal ? refractiveFactor : 0.5);
     outColour *= lighting;
 }

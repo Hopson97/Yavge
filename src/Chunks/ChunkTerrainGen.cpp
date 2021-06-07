@@ -66,7 +66,7 @@ namespace {
                 float noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise);
                 float island = rounded(coord) * 1.25;
                 float result = noise * noise2;
-                float height = result * (firstNoise.amplitude + firstNoise.offset);
+                float height = result * (firstNoise.amplitude);
 
                 if (height < WATER_LEVEL - 1) {
                     int diff = (WATER_LEVEL - 1) - height;
@@ -76,7 +76,7 @@ namespace {
                 int h = (int)(height * island - 5.0f);
                 // h ^= h * 2;
 
-                heightMap[z * CHUNK_SIZE + x] = h;
+                heightMap[z * CHUNK_SIZE + x] = h + firstNoise.offset;
             }
         }
 

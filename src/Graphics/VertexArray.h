@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ChunkMesh.h"
+#include "../Chunks/ChunkMesh.h"
 #include "Mesh.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
