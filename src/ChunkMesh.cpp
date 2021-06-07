@@ -57,11 +57,6 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
     mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
     mesh.chunkPos = chunk.position();
 
-    static int yeeet = false;
-    if (yeeet) {
-        return mesh;
-    }
-    yeeet = true;
     for (int y = 0; y < CHUNK_SIZE; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -251,21 +246,34 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                     auto quadWidth = quadSize[sweepDirB];
                     auto quadHeight = quadSize[sweepDirA];
                     GLuint texture = getVoxelTexture(thisVoxel, sliceDir, isBackFace);
+                    glm::vec3 normal{0};
+                    normal[sliceDir] = isBackFace ? -1 : 1;
                     for (int i = 0; i < 4; i++) {
                         auto s = greedyTexCoords[i].s * quadWidth;
                         auto t = greedyTexCoords[i].t * quadHeight;
                         verticies[i].textureCoord = {s, t, texture};
-                        verticies[i].normal = {0, 1, 0};
+
+                        verticies[i].normal = normal;
 
                         mesh.vertices.push_back(verticies[i]);
                     }
+                    if (isBackFace) {
+                        mesh.indices.push_back(mesh.indicesCount + 2);
+                        mesh.indices.push_back(mesh.indicesCount + 1);
+                        mesh.indices.push_back(mesh.indicesCount);
 
-                    mesh.indices.push_back(mesh.indicesCount);
-                    mesh.indices.push_back(mesh.indicesCount + 1);
-                    mesh.indices.push_back(mesh.indicesCount + 2);
-                    mesh.indices.push_back(mesh.indicesCount + 2);
-                    mesh.indices.push_back(mesh.indicesCount + 3);
-                    mesh.indices.push_back(mesh.indicesCount);
+                        mesh.indices.push_back(mesh.indicesCount);
+                        mesh.indices.push_back(mesh.indicesCount + 3);
+                        mesh.indices.push_back(mesh.indicesCount + 2);
+                    }
+                    else {
+                        mesh.indices.push_back(mesh.indicesCount);
+                        mesh.indices.push_back(mesh.indicesCount + 1);
+                        mesh.indices.push_back(mesh.indicesCount + 2);
+                        mesh.indices.push_back(mesh.indicesCount + 2);
+                        mesh.indices.push_back(mesh.indicesCount + 3);
+                        mesh.indices.push_back(mesh.indicesCount);
+                    }
                     mesh.indicesCount += 4;
 
                     // Finally, add the face to the mask so they aren't repeated
