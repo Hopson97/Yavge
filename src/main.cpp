@@ -17,8 +17,6 @@ int main()
 
     Game game;
 
-
-
     Keyboard keyboard;
     while (window.isOpen()) {
         guiBeginFrame();

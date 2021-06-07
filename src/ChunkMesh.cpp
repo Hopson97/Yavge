@@ -12,8 +12,6 @@ namespace {
     const VoxelMeshFace TOP_FACE = {{v3{1, 1, 0}, {0, 1, 0}, {0, 1, 1}, {1, 1, 1}}, v3{0, 1, 0}};
     const VoxelMeshFace BOTTOM_FACE = {{v3{0, 0, 0}, {1, 0, 0}, {1, 0, 1}, {0, 0, 1}}, v3{0, -1, 0}};
 
-    const std::array<glm::vec2, 4> textureCoords = {v2{1.0f, 0.0f}, v2{0.0f, 0.0f}, v2{0.0f, 1.0f}, v2{1.0f, 1.0f}};
-
     bool shouldMakeFace(VoxelID thisId, VoxelID compareId)
     {
         VoxelID air = 0;
@@ -32,12 +30,12 @@ namespace {
 } // namespace
 
 void ChunkMesh::addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chunkPos, const VoxelPosition& position,
-                             GLfloat textureId)
+                             int voxelId)
 {
     for (int i = 0; i < 4; i++) {
         VoxelVertex v;
         v.position = face.vertexPositions[i] + chunkPos * CHUNK_SIZE + position;
-        v.textureCoord = glm::vec3(textureCoords[i].x, textureCoords[i].y, textureId);
+        v.voxelId = voxelId;
         v.normal = face.normal;
         vertices.push_back(v);
     }
@@ -64,36 +62,35 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
                 VoxelPosition voxelPosition(x, y, z);
                 auto voxel = chunk.qGetVoxel(voxelPosition);
                 if (voxel > VoxelType::WATER) {
-                    auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
                     // Left voxel face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x - 1, y, z}))) {
-                        mesh.addVoxelFace(LEFT_FACE, p, voxelPosition, voxData.textureSide);
+                        mesh.addVoxelFace(LEFT_FACE, p, voxelPosition, voxel);
                     }
 
                     // Right chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x + 1, y, z}))) {
-                        mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition, voxData.textureSide);
+                        mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition, voxel);
                     }
 
                     // Front chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y, z + 1}))) {
-                        mesh.addVoxelFace(FRONT_FACE, p, voxelPosition, voxData.textureSide);
+                        mesh.addVoxelFace(FRONT_FACE, p, voxelPosition, voxel);
                     }
 
                     // Back chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y, z - 1}))) {
-                        mesh.addVoxelFace(BACK_FACE, p, voxelPosition, voxData.textureSide);
+                        mesh.addVoxelFace(BACK_FACE, p, voxelPosition, voxel);
                     }
 
                     // Bottom chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y - 1, z}))) {
-                        mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition, voxData.textureBottom);
+                        mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition, voxel);
                     }
 
                     // Top chunk face
                     if (shouldMakeFace(voxel, chunk.getVoxel({x, y + 1, z}))) {
-                        mesh.addVoxelFace(TOP_FACE, p, voxelPosition, voxData.textureTop);
+                        mesh.addVoxelFace(TOP_FACE, p, voxelPosition, voxel);
                     }
                 }
             }
@@ -102,13 +99,6 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
 
     return mesh;
 }
-
-const std::array<glm::vec2, 4> greedyTexCoords = {
-    v2{1.0f, 1.0f},
-    v2{1.0f, 0.0f},
-    v2{0.0f, 0.0f},
-    v2{0.0f, 1.0f},
-};
 
 // Ported from https://eddieabbondanz.io/post/voxel/greedy-mesh/
 // Consider a 3D vector as an array rather than 3 seperate components
@@ -159,7 +149,7 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                 for (start[sweepDirB] = 0; start[sweepDirB] < CHUNK_SIZE; start[sweepDirB]++) {
 
                     // Get the voxel at this location in the chunk
-                    uint16_t thisVoxel = chunk.getVoxel(start);
+                    VoxelID thisVoxel = chunk.getVoxel(start);
 
                     // Skip this voxel in the working direction if its working face is not visible or has already been
                     // merged
@@ -243,16 +233,10 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                     verticies[3].position = offset + height;
 
                     // Calulate the texture coords and add to the mesh
-                    auto quadWidth = quadSize[sweepDirB];
-                    auto quadHeight = quadSize[sweepDirA];
-                    GLuint texture = getVoxelTexture(thisVoxel, sliceDir, isBackFace);
                     glm::vec3 normal{0};
                     normal[sliceDir] = isBackFace ? -1 : 1;
                     for (int i = 0; i < 4; i++) {
-                        auto s = greedyTexCoords[i].s * quadWidth;
-                        auto t = greedyTexCoords[i].t * quadHeight;
-                        verticies[i].textureCoord = {s, t, texture};
-
+                        verticies[i].voxelId = thisVoxel;
                         verticies[i].normal = normal;
 
                         mesh.vertices.push_back(verticies[i]);
@@ -261,7 +245,6 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                         mesh.indices.push_back(mesh.indicesCount + 2);
                         mesh.indices.push_back(mesh.indicesCount + 1);
                         mesh.indices.push_back(mesh.indicesCount);
-
                         mesh.indices.push_back(mesh.indicesCount);
                         mesh.indices.push_back(mesh.indicesCount + 3);
                         mesh.indices.push_back(mesh.indicesCount + 2);
@@ -288,6 +271,9 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
     }
     return mesh;
 }
+
+/*
+
 ChunkMesh createGrassCubeMesh()
 {
     ChunkMesh mesh;
@@ -298,34 +284,34 @@ ChunkMesh createGrassCubeMesh()
 
     // clang-format off
     mesh.vertices = {
-        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{w, h, d}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
         {{0, h, d}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},  
+        {{0, 0, d}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
         {{w, 0, d}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
 
-        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, h, d}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
         {{0, h, 0}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, 
+        {{0, 0, 0}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
         {{0, 0, d}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
 
-        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{0, h, 0}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
         {{w, h, 0}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, 
+        {{w, 0, 0}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
         {{0, 0, 0}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
 
-        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, h, 0}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
         {{w, h, d}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},  
+        {{w, 0, d}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
         {{w, 0, 0}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
 
-        {{w, h, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{w, h, 0}, {1.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
         {{0, h, 0}, {0.0f, 0.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0, h, d}, {0.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},  
+        {{0, h, d}, {0.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
         {{w, h, d}, {1.0f, 1.0f, 2.0f}, {0.0f, 1.0f, 0.0f}},
 
-        {{0, 0, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{0, 0, 0}, {1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
         {{w, 0, 0}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-        {{w, 0, d}, {0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, 
+        {{w, 0, d}, {0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
         {{0, 0, d}, {1.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
     };
     // clang-format on
@@ -343,3 +329,4 @@ ChunkMesh createGrassCubeMesh()
 
     return mesh;
 }
+*/

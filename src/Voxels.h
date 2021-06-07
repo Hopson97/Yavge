@@ -1,10 +1,12 @@
 #pragma once
 
+#include "Graphics/Shader.h"
 #include <cstdint>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 class TextureArray2D;
 
-enum VoxelType : uint16_t {
+enum VoxelType : VoxelID {
     AIR = 0,
     WATER = 1,
     GRASS = 2,
@@ -17,25 +19,21 @@ enum VoxelType : uint16_t {
 
 struct Voxel {
     Voxel() = default;
-    Voxel(const char* name, GLuint textureTop, GLuint textureSide, GLuint textureBottom, bool isTransparent)
+    Voxel(const char* name, const glm::ivec3& colour, bool isTransparent)
         : name{name}
-        , textureTop{textureTop}
-        , textureSide{textureSide}
-        , textureBottom{textureBottom}
+        , colour{colour}
         , isTransparent(isTransparent)
     {
     }
     const char* name;
-    GLuint textureTop;
-    GLuint textureSide;
-    GLuint textureBottom;
-
+    glm::ivec3 colour;
     bool isTransparent;
 };
 
-void initVoxelSystem(TextureArray2D& textureArray);
+Shader initVoxelSystem();
+
 const Voxel& getVoxelType(VoxelType type);
 
-bool isVoxelSolid(uint16_t i);
+bool isVoxelSolid(VoxelID i);
 
-GLuint getVoxelTexture(uint16_t id, int direction, bool isBackFace);
+GLuint getVoxelTexture(VoxelID id, int direction, bool isBackFace);

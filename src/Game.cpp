@@ -8,7 +8,6 @@ Game::Game()
 {
     // clang-format off
     m_sceneShader   .loadFromFile("SceneVertex.glsl",   "SceneFragment.glsl");
-    m_voxelShader   .loadFromFile("VoxelVertex.glsl",   "VoxelFragment.glsl");
     m_waterShader   .loadFromFile("WaterVertex.glsl",   "WaterFragment.glsl");
     m_terrain   .bufferMesh(createTerrainMesh(64, 128, false));
     m_lightCube .bufferMesh(createCubeMesh({10.5f, 10.5f, 10.5f}));
@@ -41,7 +40,7 @@ Game::Game()
     m_waterNormalTexture.loadFromFile("WaterNormal.png", 4);
     m_waterNormalTexture.useDefaultFilters();
 
-    initVoxelSystem(m_textureArray);
+    m_voxelShader = initVoxelSystem();
 
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
@@ -272,7 +271,7 @@ void Game::prepareChunkRender(const glm::mat4& projectionViewMatrix)
     m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_voxelShader.set("lightDirection", m_sun.t.rotation);
     m_voxelShader.set("eyePosition", m_cameraTransform.position);
-    m_textureArray.bind();
+    // m_textureArray.bind();
 
     glm::mat4 voxelModel{1.0f};
     voxelModel = glm::translate(voxelModel, {0, 0, 0});

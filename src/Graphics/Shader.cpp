@@ -21,9 +21,8 @@ static const char* getShaderString(GLenum shaderType)
     }
 }
 
-static bool compileShader(GLuint* shaderOut, const char* fileName, GLenum shaderType)
+static bool compileShader(GLuint* shaderOut, const char* source, GLenum shaderType)
 {
-    char* source = getFileContent(fileName);
     if (!source) {
         fprintf(stderr, "Failed to load %s file.\n", getShaderString(shaderType));
         return false;
@@ -40,11 +39,9 @@ static bool compileShader(GLuint* shaderOut, const char* fileName, GLenum shader
         char buff[1024];
         glGetShaderInfoLog(shader, 1024, NULL, buff);
         fprintf(stderr, "%s compilation failed: %s\n", getShaderString(shaderType), buff);
-        free(source);
         return false;
     }
     *shaderOut = shader;
-    free(source);
     return true;
 }
 
@@ -68,21 +65,15 @@ Shader::~Shader()
     }
 }
 
-void Shader::loadFromFile(const char* vertexFilename, const char* fragmentFileName)
+void Shader::loadFromMemory(const char* vertexSource, const char* fragmentSource)
 {
-
-    char vertfullFileName[128] = "Data/Shaders/";
-    char fragfullFileName[128] = "Data/Shaders/";
-    strcat(vertfullFileName, vertexFilename);
-    strcat(fragfullFileName, fragmentFileName);
-
     GLuint vertexShader;
     GLuint fragmentShader;
-    if (!compileShader(&vertexShader, vertfullFileName, GL_VERTEX_SHADER)) {
+    if (!compileShader(&vertexShader, vertexSource, GL_VERTEX_SHADER)) {
         exit(1);
     }
 
-    if (!compileShader(&fragmentShader, fragfullFileName, GL_FRAGMENT_SHADER)) {
+    if (!compileShader(&fragmentShader, fragmentSource, GL_FRAGMENT_SHADER)) {
         exit(1);
     }
 
@@ -103,6 +94,23 @@ void Shader::loadFromFile(const char* vertexFilename, const char* fragmentFileNa
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+}
+
+void Shader::loadFromFile(const char* vertexFilename, const char* fragmentFileName)
+{
+
+    char vertfullFileName[128] = "Data/Shaders/";
+    char fragfullFileName[128] = "Data/Shaders/";
+    strcat(vertfullFileName, vertexFilename);
+    strcat(fragfullFileName, fragmentFileName);
+
+    char* vertexSource = getFileContent(vertfullFileName);
+    char* fragmentSource = getFileContent(fragfullFileName);
+
+    loadFromMemory(vertexSource, fragmentSource);
+
+    free(vertexSource);
+    free(fragmentSource);
 }
 
 void Shader::bind() const

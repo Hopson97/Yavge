@@ -1,12 +1,11 @@
 #version 450 core
 
-in vec3 passTextureCoord;
+in vec3 passColour;
 in vec3 passNormal;
 in vec3 passFragPosition;
 
 out vec4 outColour;
 
-uniform sampler2DArray diffuseTexture;
 uniform vec3 lightColour;
 uniform vec3 lightDirection;
 
@@ -28,5 +27,5 @@ void main()
     vec3 diffuse = lightColour * diff;
 
     vec4 result = vec4(ambient + specular + diffuse, 1.0); 
-    outColour = texture(diffuseTexture, passTextureCoord) * result;
+    outColour = vec4(passColour / 255.0, 1.0) * result;
 }

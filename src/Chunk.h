@@ -15,7 +15,7 @@ constexpr int WATER_LEVEL = CHUNK_SIZE;
 
 using VoxelPosition = glm::ivec3;
 using ChunkPosition = glm::ivec3;
-using VoxelID = uint16_t;
+using VoxelID = uint8_t;
 
 class ChunkMap;
 
@@ -35,10 +35,10 @@ class Chunk {
     {
     }
 
-    void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid);
+    void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID getVoxel(const VoxelPosition& voxelPosition) const;
 
-    void qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid);
+    void qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID qGetVoxel(const VoxelPosition& voxelPosition) const;
 
     ChunkPosition position() const
@@ -66,7 +66,7 @@ class ChunkMap {
         empty.hasTerrain = true;
     }
 
-    void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid);
+    void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID getVoxel(const VoxelPosition& voxelPosition) const;
 
     const Chunk& getChunk(const ChunkPosition& chunk) const;

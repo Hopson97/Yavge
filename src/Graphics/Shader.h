@@ -7,6 +7,7 @@ class Shader final {
   public:
     Shader() = default;
 
+    void loadFromMemory(const char* vertexSource, const char* fragmentSource);
     void loadFromFile(const char* vertexFilename, const char* fragmentFileName);
 
     void set(const char* name, int value);

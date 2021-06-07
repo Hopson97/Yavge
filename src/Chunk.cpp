@@ -69,12 +69,12 @@ namespace {
     }
 } // namespace
 
-void Chunk::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid)
+void Chunk::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition)) {
-        return m_pChunkMap->setVoxel(toGlobalVoxelPosition(voxelPosition, m_position), voxelid);
+        return m_pChunkMap->setVoxel(toGlobalVoxelPosition(voxelPosition, m_position), voxelId);
     }
-    qSetVoxel(voxelPosition, voxelid);
+    qSetVoxel(voxelPosition, voxelId);
 }
 
 VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
@@ -85,10 +85,10 @@ VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
     return qGetVoxel(voxelPosition);
 }
 
-void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid)
+void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    m_voxels[toLocalVoxelIndex(voxelPosition)] = voxelid;
+    m_voxels[toLocalVoxelIndex(voxelPosition)] = voxelId;
 }
 
 VoxelID Chunk::qGetVoxel(const VoxelPosition& voxelPosition) const
@@ -119,16 +119,16 @@ bool Chunk::compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFa
 ///
 ///
 ///
-void ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelid)
+void ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     auto chunkPosition = toChunkPosition(voxelPosition);
     auto itr = m_chunks.find(chunkPosition);
     auto local = toLocalVoxelPosition(voxelPosition);
     if (itr != m_chunks.cend()) {
-        itr->second.qSetVoxel(local, voxelid);
+        itr->second.qSetVoxel(local, voxelId);
     }
     else {
-        addChunk(chunkPosition).qSetVoxel(local, voxelid);
+        addChunk(chunkPosition).qSetVoxel(local, voxelId);
     }
     ensureNeighbours(chunkPosition);
 }

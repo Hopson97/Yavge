@@ -95,7 +95,7 @@ void VertexArray::bufferVertexData(const std::vector<VoxelVertex>& verts)
 
     // glVertexAttribPointer
     glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, position));
-    glVertexArrayAttribFormat(m_vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, textureCoord));
+    glVertexArrayAttribIFormat(m_vao, 1, 1, GL_UNSIGNED_BYTE, offsetof(VoxelVertex, voxelId));
     glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VoxelVertex, normal));
     glVertexArrayAttribBinding(m_vao, 0, 0);
     glVertexArrayAttribBinding(m_vao, 1, 0);
