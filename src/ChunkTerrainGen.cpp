@@ -40,7 +40,8 @@ namespace {
         return value / accumulatedAmps;
     }
 
-    std::array<int, CHUNK_AREA> createChunkHeightMap(const ChunkPosition& position, int worldSize, const TerrainGenOptions& firstNoise)
+    std::array<int, CHUNK_AREA> createChunkHeightMap(const ChunkPosition& position, int worldSize,
+                                                     const TerrainGenOptions& firstNoise)
     {
         const float WOLRD_SIZE = static_cast<float>(worldSize) * CHUNK_SIZE;
 

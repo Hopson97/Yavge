@@ -191,7 +191,6 @@ void Game::onRender()
         setClearColour(COLOUR_SKY_BLUE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderScene(projectionViewMatrix);
-
         prepareChunkRender(projectionViewMatrix);
         renderChunks(aboveWater);
     }
@@ -341,8 +340,6 @@ void Game::runTerrainThread()
     // 11226 -> awesome mountains
 
     // 27949 -> VIBESVIBESVIBESVIBESVIBESVIBES
-
-
 
     while (m_isRunning) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));

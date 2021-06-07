@@ -40,7 +40,9 @@ static void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint, GLenu
 
     fprintf(stderr, "OpenGL Message.\n Type: %s\nSeverity: %s\nSource: %s\nMessage: %s\n\n", typeString, severityString,
             sourceString, message);
-    throw(std::runtime_error("GL Error"));
+
+    if (severity == GL_DEBUG_SEVERITY_HIGH)
+        throw(std::runtime_error("GL Error"));
 }
 
 static void initGLDebug()
@@ -48,11 +50,10 @@ static void initGLDebug()
 #ifndef __APPLE__
 #ifndef NDEBUG
     glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // disable if in release
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
     glDebugMessageCallback(glDebugCallback, NULL);
 
-    // this disables messages printed for successfully compiled shaders
     glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL,
                           GL_FALSE);
 #endif

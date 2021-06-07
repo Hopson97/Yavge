@@ -1,11 +1,11 @@
 #include "GUI.h"
 
 #include "ChunkMesh.h"
+#include "ChunkTerrainGen.h"
 #include "Game.h"
 #include "GraphicsOptions.h"
 #include "Maths.h"
 #include "Utility.h"
-#include "ChunkTerrainGen.h"
 #include <nuklear/nuklear_def.h>
 #include <nuklear/nuklear_sfml_gl3.h>
 
