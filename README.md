@@ -101,7 +101,7 @@ At some point I was playing around with depth textures, and struggled to render 
 
 It turns out the fragment shader must select a single channel from the sampled texture and amplified to actually see it (As without the differences are too small to see).
 
-For example, typical texture mapping is (Where `tex` is a `uniform sampler2D` and `texCoord` is a vec2 for the texuture coords):
+For example, typical texture mapping is (Where `tex` is a `uniform sampler2D` and `texCoord` is a vec2 for the texture coords):
 
 ```glsl
 void main() { 
