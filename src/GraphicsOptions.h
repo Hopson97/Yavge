@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utility.h"
+
 struct GraphicsOptions {
     int doWaterReflection = true;
     int doWaterRefraction = true;
@@ -10,4 +12,6 @@ struct GraphicsOptions {
     int doFresnel = true;
 
     int showPreviews = false;
+
+    glm::vec4 clearColour = COLOUR_SKY_BLUE;
 };

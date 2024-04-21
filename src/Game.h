@@ -35,7 +35,7 @@ struct ChunkRenderable {
 struct Sun {
     Transform t;
     int orbitSpeed = 25000;
-    int center;
+    int center = 0;
 
     void update(int worldSize, float time)
     {

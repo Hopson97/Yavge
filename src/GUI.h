@@ -18,7 +18,7 @@ struct Stats {
     int blockFacesDrawn;
     int totalBlockFaces;
 
-    int verticiesDrawn;
+    int verticesDrawn;
     int totalVertices;
 };
 

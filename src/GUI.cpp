@@ -88,6 +88,15 @@ void guiEndFrame(void)
 
 void guiDebugScreen(const Transform& transform, const Stats& stats)
 {
+    if (nk_begin(ctx, "Instructions", nk_rect(WIDTH - 250, 10, 240, 100), window_flags)) {
+        nk_layout_row_dynamic(ctx, 12, 1);
+        nk_labelf(ctx, NK_STATIC, "Press 'L' to lock mouse");
+        nk_labelf(ctx, NK_STATIC, "Press 'ESC' to exit");
+        nk_labelf(ctx, NK_STATIC, "Hold 'L-Shift' to move faster");
+    }
+    nk_end(ctx);
+
+
     static int wireframe = false;
     if (nk_begin(ctx, "Debug Window", nk_rect(10, 10, 300, 130), window_flags)) {
         nk_layout_row_dynamic(ctx, 12, 1);
@@ -109,16 +118,16 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
         nk_layout_row_dynamic(ctx, 12, 1);
         nk_labelf(ctx, NK_STATIC, "Note: These numbers DO NOT include redraws (EG reflections).");
         nk_layout_row_dynamic(ctx, 14, 1);
-        int verticiesDrawn = stats.verticiesDrawn;
+        int verticesDrawn = stats.verticesDrawn;
         int totalVertices = stats.totalVertices;
-        float verticiesDrawnMem = (float)sizeof(VoxelVertex) * stats.verticiesDrawn / (1024.0f * 1024.0f);
+        float verticesDrawnMem = (float)sizeof(VoxelVertex) * stats.verticesDrawn / (1024.0f * 1024.0f);
         float totalVerticesMem = (float)sizeof(VoxelVertex) * stats.totalVertices / (1024.0f * 1024.0f);
         int blockFacesDrawn = stats.blockFacesDrawn;
         int totalBlockFaces = stats.totalBlockFaces;
 
         nk_labelf(ctx, NK_STATIC, "Chunks Drawn: %d / %d", stats.chunksDrawn, stats.totalChunks);
-        nk_labelf(ctx, NK_STATIC, "Vertices Drawn: %s / %s (%.*f / %.*f MB)", formatNumber(verticiesDrawn).c_str(),
-                  formatNumber(totalVertices).c_str(), 2, verticiesDrawnMem, 2, totalVerticesMem);
+        nk_labelf(ctx, NK_STATIC, "Vertices Drawn: %s / %s (%.*f / %.*f MB)", formatNumber(verticesDrawn).c_str(),
+                  formatNumber(totalVertices).c_str(), 2, verticesDrawnMem, 2, totalVerticesMem);
         nk_labelf(ctx, NK_STATIC, "Faces Drawn: %s / %s", formatNumber(blockFacesDrawn).c_str(),
                   formatNumber(totalBlockFaces).c_str());
     }
@@ -127,15 +136,30 @@ void guiDebugScreen(const Transform& transform, const Stats& stats)
 
 void guiGraphicsOptions(GraphicsOptions* options)
 {
-    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 150, 300, 200), window_flags)) {
-        nk_layout_row_dynamic(ctx, 14, 1);
-        nk_labelf(ctx, NK_STATIC, "Press 'L' to unlock mouse.");
-        nk_labelf(ctx, NK_STATIC, "Press 'ESC' to exit.");
+    if (nk_begin(ctx, "Graphics Options", nk_rect(10, 150, 400, 200), window_flags)) {
 
+        nk_layout_row_dynamic(ctx, 16, 1);
+        nk_labelf(ctx, NK_STATIC, "Sky Colour");
+
+        nk_layout_row_dynamic(ctx, 16, 6);
+        nk_labelf(ctx, NK_STATIC, "R: %.*f", 2, options->clearColour.r);
+        nk_slider_float(ctx, 0, &options->clearColour.r, 255, 1);
+
+        nk_labelf(ctx, NK_STATIC, "G: %.*f", 2, options->clearColour.g);
+        nk_slider_float(ctx, 0, &options->clearColour.g, 255, 1);
+
+        nk_labelf(ctx, NK_STATIC, "B: %.*f", 2, options->clearColour.b);
+        nk_slider_float(ctx, 0, &options->clearColour.b, 255, 1);
+
+        //nk_slider_float(ctx, 0, &options->clearColour.g, 255, 1);
+        //nk_slider_float(ctx, 0, &options->clearColour.b, 255, 1);
+
+
+        nk_layout_row_dynamic(ctx, 14, 1);
         nk_checkbox_label(ctx, "Reflection Enabled", &options->doWaterReflection);
         nk_checkbox_label(ctx, "Refractions Enabled", &options->doWaterRefraction);
         nk_checkbox_label(ctx, "Fresnel Effect", &options->doFresnel);
-        nk_checkbox_label(ctx, "Water Distortian", &options->useDistortMaps);
+        nk_checkbox_label(ctx, "Water Distortion", &options->useDistortMaps);
         nk_checkbox_label(ctx, "Water Normal", &options->useNormal);
 
         nk_checkbox_label(ctx, "Show Previews", &options->showPreviews);
@@ -143,51 +167,51 @@ void guiGraphicsOptions(GraphicsOptions* options)
     nk_end(ctx);
 }
 
-void guiResetWorld(Game* game, void (Game::*resetWorldFunc)(int), TerrainGenOptions* nops)
+void guiResetWorld(Game* game, void (Game::*resetWorldFunc)(int), TerrainGenOptions* terrainOptions)
 {
-    static int worldSize = 8;
+    static int worldSize = 12;
     static char seedBuff[7];
     if (nk_begin(ctx, "World Reset", nk_rect(10, 370, 300, 300), window_flags)) {
         nk_layout_row_dynamic(ctx, 16, 2);
         nk_labelf(ctx, NK_STATIC, "World Size: %d", worldSize);
         nk_slider_int(ctx, 4, &worldSize, 40, 1);
 
-        nk_labelf(ctx, NK_STATIC, "Octaves: %d", nops->octaves);
-        nk_slider_int(ctx, 1, &nops->octaves, 16, 1);
+        nk_labelf(ctx, NK_STATIC, "Octaves: %d", terrainOptions->octaves);
+        nk_slider_int(ctx, 1, &terrainOptions->octaves, 16, 1);
 
-        nk_labelf(ctx, NK_STATIC, "Amplitude: %.*f", 2, nops->amplitude);
-        nk_slider_float(ctx, 50, &nops->amplitude, 2000, 1);
+        nk_labelf(ctx, NK_STATIC, "Amplitude: %.*f", 2, terrainOptions->amplitude);
+        nk_slider_float(ctx, 50, &terrainOptions->amplitude, 2000, 1);
 
-        nk_labelf(ctx, NK_STATIC, "Smoothness: %.*f", 2, nops->smoothness);
-        nk_slider_float(ctx, 50, &nops->smoothness, 2000, 1);
+        nk_labelf(ctx, NK_STATIC, "Smoothness: %.*f", 2, terrainOptions->smoothness);
+        nk_slider_float(ctx, 50, &terrainOptions->smoothness, 2000, 1);
 
-        nk_labelf(ctx, NK_STATIC, "Roughness: %.*f", 2, nops->roughness);
-        nk_slider_float(ctx, 0.1, &nops->roughness, 2, 0.1);
+        nk_labelf(ctx, NK_STATIC, "Roughness: %.*f", 2, terrainOptions->roughness);
+        nk_slider_float(ctx, 0.1, &terrainOptions->roughness, 2, 0.1);
 
-        nk_labelf(ctx, NK_STATIC, "Height Offset: %.*f", 2, nops->offset);
-        nk_slider_float(ctx, -100, &nops->offset, 100, 1);
+        nk_labelf(ctx, NK_STATIC, "Height Offset: %.*f", 2, terrainOptions->offset);
+        nk_slider_float(ctx, -100, &terrainOptions->offset, 100, 1);
 
         nk_layout_row_dynamic(ctx, 25, 1);
 
-        nk_checkbox_label(ctx, "Greedy Meshing", &nops->useGreedyMeshing);
+        nk_checkbox_label(ctx, "Greedy Meshing", &terrainOptions->useGreedyMeshing);
 
         nk_layout_row_dynamic(ctx, 25, 2);
-        nk_labelf(ctx, NK_STATIC, "Seed: %d", nops->seed);
+        nk_labelf(ctx, NK_STATIC, "Seed: %d", terrainOptions->seed);
         nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, seedBuff, 6, nk_filter_decimal);
 
         nk_layout_row_dynamic(ctx, 25, 1);
         if (nk_button_label(ctx, "Reset World")) {
-            nops->seed = std::atoi(seedBuff);
+            terrainOptions->seed = std::atoi(seedBuff);
             (*game.*resetWorldFunc)(worldSize);
         }
 
         if (nk_button_label(ctx, "Random World")) {
-            nops->octaves = rand() % 16;
-            nops->amplitude = (float)rand() / (float)RAND_MAX * 1000.0f + 50.0f;
-            nops->smoothness = (float)rand() / (float)RAND_MAX * 1000.0f + 50.0f;
-            nops->roughness = (float)rand() / (float)RAND_MAX * 1.5;
-            nops->offset = rand() % 200 - 100;
-            nops->seed = std::rand() % 30000;
+            terrainOptions->octaves = rand() % 16;
+            terrainOptions->amplitude = (float)rand() / (float)RAND_MAX * 1000.0f + 50.0f;
+            terrainOptions->smoothness = (float)rand() / (float)RAND_MAX * 1000.0f + 50.0f;
+            terrainOptions->roughness = (float)rand() / (float)RAND_MAX * 1.5f;
+            terrainOptions->offset = (float)(rand() % 200 - 100);
+            terrainOptions->seed = std::rand() % 30000;
 
             (*game.*resetWorldFunc)(worldSize);
         }

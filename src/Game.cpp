@@ -1,8 +1,10 @@
 #include "Game.h"
 
 #include "Chunks/ChunkTerrainGen.h"
-#include "Utility.h"
 #include "Chunks/Voxels.h"
+#include "Utility.h"
+
+#include <glad/glad.h>
 
 Game::Game()
 {
@@ -45,9 +47,9 @@ Game::Game()
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
-    resetWorld(8);
+    resetWorld(16);
 
-    m_cameraTransform = { {CHUNK_SIZE, CHUNK_SIZE * 1.5, CHUNK_SIZE}, {0, 0, 0} };
+    m_cameraTransform = { {CHUNK_SIZE / 2, CHUNK_SIZE * 3, m_worldSize * CHUNK_SIZE / 2}, {0, 0, 0} };
 
     // clang-format on
 }
@@ -98,7 +100,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     Transform& camera = m_cameraTransform;
 
     float PLAYER_SPEED = 0.5f;
-    if (keyboard.isKeyDown(sf::Keyboard::LControl)) {
+    if (keyboard.isKeyDown(sf::Keyboard::LControl) || keyboard.isKeyDown(sf::Keyboard::LShift)) {
         PLAYER_SPEED = 5.0f;
     }
     if (keyboard.isKeyDown(sf::Keyboard::W)) {
@@ -156,7 +158,7 @@ void Game::onUpdate()
     m_stats.chunksDrawn = 0;
     m_isUnderwater = m_cameraTransform.position.y < WATER_LEVEL;
 
-    m_stats.verticiesDrawn = 0;
+    m_stats.verticesDrawn = 0;
     m_stats.totalVertices = 0;
     m_stats.blockFacesDrawn = 0;
     m_stats.totalBlockFaces = 0;
@@ -183,11 +185,10 @@ void Game::onRender()
     if (m_options.doWaterReflection && !m_isUnderwater) {
         m_reflectFramebuffer.bind();
 
-        auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
+        auto viewMatrix = createViewMatrix(m_cameraTransform, {0, 1, 0});
         auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
         m_frustum.update(projectionViewMatrix);
 
-        setClearColour(COLOUR_SKY_BLUE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderScene(projectionViewMatrix);
         prepareChunkRender(projectionViewMatrix);
@@ -197,12 +198,11 @@ void Game::onRender()
     m_cameraTransform.position.y += distance;
     m_cameraTransform.rotation.x = -m_cameraTransform.rotation.x;
 
-    auto viewMatrix = createViewMartix(m_cameraTransform, {0, 1, 0});
+    auto viewMatrix = createViewMatrix(m_cameraTransform, {0, 1, 0});
     auto projectionViewMatrix = m_projectionMatrix * viewMatrix;
     m_frustum.update(projectionViewMatrix);
 
     if (m_options.doWaterRefraction) {
-        setClearColour(COLOUR_SKY_BLUE);
         m_refractFramebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -210,7 +210,7 @@ void Game::onRender()
         renderChunks(m_isUnderwater ? aboveWater : underwater, true);
     }
 
-    setClearColour(COLOUR_SKY_BLUE);
+    setClearColour(m_options.clearColour);
     Framebuffer::unbind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -285,7 +285,7 @@ void Game::renderChunks(std::vector<ChunkRenderable>& renderList, bool count)
             chunk.renderable.drawElements();
             if (count) {
                 m_stats.chunksDrawn++;
-                m_stats.verticiesDrawn += chunk.numVerts;
+                m_stats.verticesDrawn += chunk.numVerts;
                 m_stats.blockFacesDrawn += chunk.numFaces;
             }
         }
