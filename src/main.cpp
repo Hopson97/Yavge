@@ -33,6 +33,9 @@ int main()
                     window.setMouseCursorVisible(!isMouseActive);
                 }
             }
+            else if (e.type == sf::Event::Closed) {
+                window.close();
+            }
         }
 
         game.onInput(keyboard, window, isMouseActive);

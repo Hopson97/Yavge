@@ -4,14 +4,14 @@
 
 struct TerrainGenOptions {
     int octaves = 8;
-    float amplitude = 230;
-    float smoothness = 500;
-    float roughness = 0.58;
-    float offset = 0;
+    float amplitude = 337.0f;
+    float smoothness = 500.0f;
+    float roughness = 0.58f;
+    float offset = -30.0f;
 
     int seed;
     int useGreedyMeshing = true;
 };
 
 std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize,
-                                              const TerrainGenOptions& TerrainGenOptions);
+                                              const TerrainGenOptions& terrainGenOptions);

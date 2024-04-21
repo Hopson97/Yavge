@@ -9,7 +9,7 @@
 // Regular vertex except it uses a 3D texture so that it can support OpenGL 2D Texture Arrays
 struct VoxelVertex {
     glm::vec3 position{0.0f};
-    VoxelID voxelId;
+    VoxelID voxelId = 0;
     glm::vec3 normal{0.0f};
 };
 
@@ -30,6 +30,5 @@ struct ChunkMesh {
     void addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chunkPos, const VoxelPosition& position, int id);
 };
 
-ChunkMesh createGrassCubeMesh();
 ChunkMesh createChunkMesh(const Chunk& chunk);
 ChunkMesh createGreedyChunkMesh(const Chunk& chunk);

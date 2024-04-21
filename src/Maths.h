@@ -13,7 +13,7 @@ struct Transform {
 
 glm::mat4 createModelMatrix(const Transform& transform);
 glm::mat4 createOrbitModelMatrix(const Transform& transform);
-glm::mat4 createViewMartix(const Transform& transform, const glm::vec3& up);
+glm::mat4 createViewMatrix(const Transform& transform, const glm::vec3& up);
 glm::mat4 createProjectionMatrix(float aspectRatio, float fov);
 
 glm::vec3 forwardsVector(const glm::vec3& rotation);

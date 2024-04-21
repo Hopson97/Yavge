@@ -34,10 +34,9 @@ Shader initVoxelSystem()
     voxels[STONE] = {"Stone", {100, 100, 100}, false};
     voxels[SAND] = {"Sand", {194, 178, 128}, false};
 
-    char* vertexSource = getFileContent("Data/Shaders/VoxelVertex.glsl");
-    char* fragmentSource = getFileContent("Data/Shaders/VoxelFragment.glsl");
+    auto vertexSource = getFileContent("Data/Shaders/VoxelVertex.glsl");
+    auto fragmentSource = getFileContent("Data/Shaders/VoxelFragment.glsl");
 
-    std::string voxelVertex = vertexSource;
     std::string source;
     source.reserve(voxels.size() * 32);
     source += "vec3 voxelColours[] = vec3[](\n";
@@ -48,14 +47,11 @@ Shader initVoxelSystem()
         source += std::string("\tvec3(" + r + "," + g + "," + b + ((i == voxels.size() - 1) ? ")\n" : "),\n"));
     }
     source += ");";
-    replace(voxelVertex, "<COLOURS>", source);
+    replace(vertexSource, "<COLOURS>", source);
 
 
     Shader voxelShader;
-    voxelShader.loadFromMemory(voxelVertex.c_str(), fragmentSource);
-
-    free(vertexSource);
-    free(fragmentSource);
+    voxelShader.loadFromMemory(vertexSource.c_str(), fragmentSource.c_str());
 
     return voxelShader;
 }

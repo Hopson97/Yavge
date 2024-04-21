@@ -52,7 +52,7 @@ ChunkMesh createChunkMesh(const Chunk& chunk)
 {
     ChunkMesh mesh;
     auto p = chunk.position();
-    mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
+    mesh.chunkPosY = (float)(chunk.position().y * CHUNK_SIZE);
     mesh.chunkPos = chunk.position();
 
     for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -111,7 +111,7 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
 {
     ChunkMesh mesh;
     auto p = chunk.position();
-    mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
+    mesh.chunkPosY = (float)(chunk.position().y * CHUNK_SIZE);
     mesh.chunkPos = chunk.position();
 
     // For each slice, a mask is created to determine if a block face has already been visited
@@ -161,7 +161,7 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                     // Adajacent voxel faces are then combined into this one by:
                     //  1. Calculate the width of this voxel section
                     //  2. Calculate the height of this voxel section
-                    //  3. Create 4 verticies, and add them to the chunk mesh
+                    //  3. Create 4 vertices, and add them to the chunk mesh
 
                     VoxelPosition currPos = start;
                     glm::ivec3 quadSize{0};
@@ -226,20 +226,20 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                     offset[sliceDir] += isBackFace ? 0 : 1;
 
                     // Calculate the positon
-                    VoxelVertex verticies[4];
-                    verticies[0].position = offset;
-                    verticies[1].position = offset + width;
-                    verticies[2].position = offset + width + height;
-                    verticies[3].position = offset + height;
+                    VoxelVertex vertices[4];
+                    vertices[0].position = offset;
+                    vertices[1].position = offset + width;
+                    vertices[2].position = offset + width + height;
+                    vertices[3].position = offset + height;
 
                     // Calulate the texture coords and add to the mesh
                     glm::vec3 normal{0};
                     normal[sliceDir] = isBackFace ? -1 : 1;
                     for (int i = 0; i < 4; i++) {
-                        verticies[i].voxelId = thisVoxel;
-                        verticies[i].normal = normal;
+                        vertices[i].voxelId = thisVoxel;
+                        vertices[i].normal = normal;
 
-                        mesh.vertices.push_back(verticies[i]);
+                        mesh.vertices.push_back(vertices[i]);
                     }
                     if (isBackFace) {
                         mesh.indices.push_back(mesh.indicesCount + 2);

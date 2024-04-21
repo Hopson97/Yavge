@@ -25,7 +25,7 @@ glm::mat4 createOrbitModelMatrix(const Transform& transform)
     return matrix;
 }
 
-glm::mat4 createViewMartix(const Transform& transform, const glm::vec3& up)
+glm::mat4 createViewMatrix(const Transform& transform, const glm::vec3& up)
 {
     glm::vec3 center{0.0f};
     glm::vec3 front{0.0f};

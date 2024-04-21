@@ -60,23 +60,24 @@ namespace {
                 float bx = static_cast<float>(x + position.x * CHUNK_SIZE);
                 float bz = static_cast<float>(z + position.z * CHUNK_SIZE);
 
-                glm::vec2 coord = (glm::vec2{bx, bz} - WOLRD_SIZE / 2.0f) / WOLRD_SIZE * 2.0f;
+                //glm::vec2 coord = (glm::vec2{bx, bz} - WOLRD_SIZE / 2.0f) / WOLRD_SIZE * 2.0f;
 
                 float noise = getNoiseAt({x, z}, chunkXZ, firstNoise);
                 float noise2 = getNoiseAt({x, z}, {position.x, position.z}, secondNoise);
-                float island = rounded(coord) * 1.25;
+                //float island = rounded(coord) * 1.25;
                 float result = noise * noise2;
                 float height = result * (firstNoise.amplitude);
 
                 if (height < WATER_LEVEL - 1) {
                     int diff = (WATER_LEVEL - 1) - height;
                     diff -= diff / 2;
-                    height = WATER_LEVEL - diff - 1;
+                    height = WATER_LEVEL - diff - 1.0f;
                 }
-                int h = (int)(height * island - 5.0f);
+                //int h = (int)(height * island - 5.0f);
                 // h ^= h * 2;
+                int h = height;
 
-                heightMap[z * CHUNK_SIZE + x] = h + firstNoise.offset;
+                heightMap[z * CHUNK_SIZE + x] = (int)(h + firstNoise.offset);
             }
         }
 
@@ -146,12 +147,12 @@ namespace {
 } // namespace
 
 std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ, int worldSize,
-                                              const TerrainGenOptions& TerrainGenOptions)
+                                              const TerrainGenOptions& terrainGenOptions)
 {
     std::vector<ChunkPosition> positions;
     ChunkPosition position{chunkX, 0, chunkZ};
 
-    auto heightMap = createChunkHeightMap(position, worldSize, TerrainGenOptions);
+    auto heightMap = createChunkHeightMap(position, worldSize, terrainGenOptions);
     auto biomeMap = createBiomeMap(position);
     int maxHeight = *std::max_element(heightMap.cbegin(), heightMap.cend());
     for (int y = 0; y < std::max(WATER_LEVEL / CHUNK_SIZE, maxHeight / CHUNK_SIZE) + 1; y++) {
