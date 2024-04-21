@@ -2,21 +2,17 @@
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Window.hpp>
+
+#include <glm/glm.hpp>
+
 #include <array>
+#include <filesystem>
 
 // Default window height and width
-#define WIDTH 1600
-#define HEIGHT 900
+constexpr unsigned WIDTH = 1600;
+constexpr unsigned HEIGHT = 900;
 
-char* getFileContent(const char* fileName);
-
-// Colour Util
-struct Colour {
-    uint8_t red = 255;
-    uint8_t green = 255;
-    uint8_t blue = 255;
-    uint8_t alpha = 255;
-};
+std::string getFileContent(const std::filesystem::path& filePath);
 
 enum ColourSetMode {
     COL_SET_BG = 48,
@@ -49,14 +45,10 @@ class Keyboard {
     std::array<bool, sf::Keyboard::KeyCount> m_keys{false};
 };
 
-void setTerminalBackgroundColour(Colour colour);
-void setTerminalTextColour(Colour colour);
-
-void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue);
-void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue);
-
 bool initWindow(sf::Window* window);
+void setClearColour(const glm::vec4& colour);
+void setTextColour(const glm::vec4& colour);
+void setBackgroundColour(const glm::vec4& colour);
 
-const Colour COLOUR_SKY_BLUE = {135, 206, 235, 255};
-const Colour COLOUR_SAND = {235, 214, 135, 255};
-void setClearColour(Colour colour);
+const glm::vec4 COLOUR_SKY_BLUE = {135, 206, 235, 255};
+const glm::vec4 COLOUR_SAND = {235, 214, 135, 255};

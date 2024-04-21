@@ -83,9 +83,9 @@ void Framebuffer::addRenderBuffer()
 void Framebuffer::finish()
 {
     if (auto status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        setTextColourRGB(255, 0, 0);
+        setTextColour({255, 0, 0, 255});
         fprintf(stderr, "Failed to create framebuffer. %d\n", status);
-        setTextColourRGB(255, 255, 255);
+        setTextColour({255, 255, 255, 255});
         fflush(stderr);
     }
 }

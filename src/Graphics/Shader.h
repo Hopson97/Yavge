@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../Maths.h"
-#include <glad/glad.h>
 #include <unordered_map>
+
+#include "../Maths.h"
+
 class Shader final {
   public:
     Shader() = default;

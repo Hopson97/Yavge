@@ -29,7 +29,7 @@ static bool compileShader(GLuint* shaderOut, const char* source, GLenum shaderTy
     }
     GLuint shader = glCreateShader(shaderType);
 
-    int length = strlen(source);
+    GLint length = (GLint)strlen(source);
     glShaderSource(shader, 1, (const GLchar* const*)&source, &length);
     glCompileShader(shader);
 
@@ -104,13 +104,10 @@ void Shader::loadFromFile(const char* vertexFilename, const char* fragmentFileNa
     strcat(vertfullFileName, vertexFilename);
     strcat(fragfullFileName, fragmentFileName);
 
-    char* vertexSource = getFileContent(vertfullFileName);
-    char* fragmentSource = getFileContent(fragfullFileName);
+    auto vertexSource = getFileContent(vertfullFileName);
+    auto fragmentSource = getFileContent(fragfullFileName);
 
-    loadFromMemory(vertexSource, fragmentSource);
-
-    free(vertexSource);
-    free(fragmentSource);
+    loadFromMemory(vertexSource.c_str(), fragmentSource.c_str());
 }
 
 void Shader::bind() const

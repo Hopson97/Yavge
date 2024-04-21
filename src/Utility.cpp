@@ -1,12 +1,18 @@
 #include "Utility.h"
+
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+
 #include <glad/glad.h>
 
-static void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint, GLenum severity, GLsizei,
-                                       const GLchar* message, const void*)
-{
-    // clang-format off
+namespace {
+
+    void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message,
+                                    const void*)
+    {
+        // clang-format off
     const char* severityString = "?";
     switch (severity) {
         case GL_DEBUG_SEVERITY_HIGH:            severityString = "high";    break;
@@ -36,108 +42,77 @@ static void GLAPIENTRY glDebugCallback(GLenum source, GLenum type, GLuint, GLenu
         case GL_DEBUG_TYPE_POP_GROUP:               typeString = "pop group";           break;
         case GL_DEBUG_TYPE_OTHER:                   typeString = "other";               break;
     }
-    // clang-format on
+        // clang-format on
 
-    fprintf(stderr, "OpenGL Message.\n Type: %s\nSeverity: %s\nSource: %s\nMessage: %s\n\n", typeString, severityString,
-            sourceString, message);
+        fprintf(stderr, "OpenGL Message.\n Type: %s\nSeverity: %s\nSource: %s\nMessage: %s\n\n", typeString,
+                severityString, sourceString, message);
 
-    if (severity == GL_DEBUG_SEVERITY_HIGH)
-        throw(std::runtime_error("GL Error"));
-}
+        if (severity == GL_DEBUG_SEVERITY_HIGH)
+            throw(std::runtime_error("GL Error"));
+    }
 
-static void initGLDebug()
-{
+    static void initGLDebug()
+    {
 #ifndef __APPLE__
 #ifndef NDEBUG
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
-    glDebugMessageCallback(glDebugCallback, NULL);
+        glDebugMessageCallback(glDebugCallback, NULL);
 
-    glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL,
-                          GL_FALSE);
+        glDebugMessageControl(GL_DEBUG_SOURCE_SHADER_COMPILER, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0,
+                              NULL, GL_FALSE);
 #endif
-}
-
-static int isColourSame(Colour a, Colour b)
-{
-    return a.red == b.red && a.green == b.green && a.blue == b.blue;
-}
-
-static void setTerminalColour(Colour colour, enum ColourSetMode mode)
-{
-    static int isFirstTimeBG = 1;
-    static int isFirstTimeFG = 1;
-    static struct Colour currentTextColour;
-    static struct Colour currentBackgroundColour;
-    uint8_t r = colour.red;
-    uint8_t g = colour.green;
-    uint8_t b = colour.blue;
-    switch (mode) {
-        case COL_SET_BG:
-            if (!isColourSame(currentBackgroundColour, colour) || isFirstTimeBG) {
-                printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
-                isFirstTimeBG = 1;
-            }
-            break;
-
-        case COL_SET_FG:
-            if (!isColourSame(currentTextColour, colour) || isFirstTimeFG) {
-                printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
-                isFirstTimeFG = 1;
-            }
-            break;
     }
-}
 
-char* getFileContent(const char* fileName)
-{
-    char* buffer = NULL;
-    long length = 0;
-    FILE* file = fopen(fileName, "r");
+    void setTerminalColour(const glm::vec4& colour, enum ColourSetMode mode)
+    {
+        static bool isFirstTimeBG = true;
+        static bool isFirstTimeFG = true;
+        static glm::vec4 currentTextColour;
+        static glm::vec4 currentBackgroundColour;
+        uint8_t r = colour.r;
+        uint8_t g = colour.g;
+        uint8_t b = colour.b;
+        switch (mode) {
+            case COL_SET_BG:
+                if (currentBackgroundColour != colour || isFirstTimeBG) {
+                    printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
+                    isFirstTimeBG = 1;
+                }
+                break;
 
-    if (file) {
-        fseek(file, 0, SEEK_END);
-        length = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        buffer = (char*)calloc(length + 1, 1);
-        if (buffer) {
-            if (!fread(buffer, 1, length, file)) {
-                free(buffer);
-            }
+            case COL_SET_FG:
+                if (currentBackgroundColour != colour || isFirstTimeFG) {
+                    printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
+                    isFirstTimeFG = 1;
+                }
+                break;
         }
-        fclose(file);
     }
-    return buffer;
-}
+} // namespace
 
-void setBackgroundColour(Colour colour)
+std::string getFileContent(const std::filesystem::path& filePath)
 {
-    setTerminalColour(colour, COL_SET_BG);
+    std::ifstream file(filePath);
+
+    if (!file) {
+        std::cerr << "Failed to open file " << filePath << std::endl;
+        return "";
+    }
+
+    std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+
+    return content;
 }
 
-void setTextColour(Colour colour)
+void setTextColour(const glm::vec4& colour)
 {
     setTerminalColour(colour, COL_SET_FG);
 }
 
-void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue)
+void setBackgroundColour(const glm::vec4& colour)
 {
-    struct Colour colour = {
-        red,
-        green,
-        blue,
-    };
-    setTerminalColour(colour, COL_SET_FG);
-}
-
-void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue)
-{
-    struct Colour colour = {
-        red,
-        green,
-        blue,
-    };
     setTerminalColour(colour, COL_SET_BG);
 }
 
@@ -150,8 +125,7 @@ bool initWindow(sf::Window* window)
     contextSettings.majorVersion = 4;
     contextSettings.minorVersion = 5;
     contextSettings.attributeFlags = sf::ContextSettings::Core;
-    window->create({1600, 900}, "Y A V G E", sf::Style::Close, contextSettings);
-    window->setPosition({(int)sf::VideoMode::getDesktopMode().width / 2 + 150, HEIGHT / 16});
+    window->create({1600, 900}, "Y A V G E", sf::Style::Default, contextSettings);
     window->setMouseCursorVisible(false);
     if (!gladLoadGL()) {
         printf("Error: Could not load OpenGL.");
@@ -162,11 +136,11 @@ bool initWindow(sf::Window* window)
     return true;
 }
 
-void setClearColour(Colour colour)
+void setClearColour(const glm::vec4& colour)
 {
-    float r = (float)colour.red / 255.0f;
-    float g = (float)colour.green / 255.0f;
-    float b = (float)colour.blue / 255.0f;
-    float a = (float)colour.alpha / 255.0f;
+    float r = (float)colour.r / 255.0f;
+    float g = (float)colour.g / 255.0f;
+    float b = (float)colour.b / 255.0f;
+    float a = (float)colour.a / 255.0f;
     glClearColor(r, g, b, a);
 }
