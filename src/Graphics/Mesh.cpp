@@ -112,14 +112,14 @@ Mesh createTerrainMesh(int size, int edgeVertices, bool isFlat)
     float fEdgeVertexCount = static_cast<float>(edgeVertices);
 
     TerrainGenOptions terrainNoise;
-    terrainNoise.roughness = 0.7;
+    terrainNoise.roughness = 0.7f;
     terrainNoise.smoothness = 350.0f;
     terrainNoise.octaves = 5;
     terrainNoise.amplitude = 45.0f;
     terrainNoise.offset = -33;
 
     TerrainGenOptions bumpNoise;
-    bumpNoise.roughness = 0.6;
+    bumpNoise.roughness = 0.6f;
     bumpNoise.smoothness = 50.0f;
     bumpNoise.octaves = 5;
     bumpNoise.amplitude = 5.0f;

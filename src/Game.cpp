@@ -128,12 +128,12 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     lastMousePosition.y = (int)window.getSize().y / 2;
 
     camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
-    camera.rotation.y = (int)camera.rotation.y % 360;
+    camera.rotation.y = static_cast<float>((int)camera.rotation.y % 360);
 }
 
 void Game::onUpdate()
 {
-    m_sun.update(m_worldSize, m_timer.getElapsedTime().asMilliseconds());
+    m_sun.update(m_worldSize, (float)m_timer.getElapsedTime().asMilliseconds());
     std::unique_lock<std::mutex> l(m_chunkVectorLock);
     while (!m_chunkMeshQueue.empty()) {
 
@@ -142,8 +142,8 @@ void Game::onUpdate()
         if (mesh.indicesCount > 0) {
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(mesh);
-            int verts = mesh.vertices.size();
-            int faces = verts / 4;
+            auto verts = mesh.vertices.size();
+            auto faces = verts / 4;
             if (mesh.chunkPosY >= WATER_LEVEL) {
                 m_chunkAboveWaterRenderList.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable(), verts, faces);
             }

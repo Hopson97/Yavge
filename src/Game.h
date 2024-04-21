@@ -1,19 +1,21 @@
 #pragma once
 
-#include "Chunks/Chunk.h"
-#include "Chunks/ChunkTerrainGen.h"
-#include "GUI.h"
-#include "Graphics/GLWrappers.h"
-#include "GraphicsOptions.h"
-#include "Maths.h"
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Window.hpp>
 #include <atomic>
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
 #include <vector>
+
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Window.hpp>
+
+#include "Chunks/Chunk.h"
+#include "Chunks/ChunkTerrainGen.h"
+#include "GUI.h"
+#include "Graphics/GLWrappers.h"
+#include "GraphicsOptions.h"
+#include "Maths.h"
 
 class Keyboard;
 

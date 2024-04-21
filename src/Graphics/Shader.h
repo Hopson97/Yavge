@@ -2,6 +2,9 @@
 
 #include <unordered_map>
 
+#include <glad/glad.h>
+
+
 #include "../Maths.h"
 
 class Shader final {

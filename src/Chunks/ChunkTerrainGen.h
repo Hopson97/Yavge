@@ -9,7 +9,7 @@ struct TerrainGenOptions {
     float roughness = 0.58f;
     float offset = -30.0f;
 
-    int seed;
+    int seed = 0;
     int useGreedyMeshing = true;
 };
 

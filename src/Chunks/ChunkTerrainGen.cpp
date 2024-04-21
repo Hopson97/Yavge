@@ -26,8 +26,8 @@ namespace {
         float value = 0;
         float accumulatedAmps = 0;
         for (int i = 0; i < options.octaves; i++) {
-            float frequency = glm::pow(2.0f, i);
-            float amplitude = glm::pow(options.roughness, i);
+            float frequency = (float)glm::pow(2.0f, i);
+            float amplitude = (float)glm::pow(options.roughness, i);
 
             float x = voxelX * frequency / options.smoothness;
             float y = voxelZ * frequency / options.smoothness;
@@ -73,11 +73,10 @@ namespace {
                     diff -= diff / 2;
                     height = WATER_LEVEL - diff - 1.0f;
                 }
-                //int h = (int)(height * island - 5.0f);
+                // height = (int)(height * island - 5.0f);
                 // h ^= h * 2;
-                int h = height;
 
-                heightMap[z * CHUNK_SIZE + x] = (int)(h + firstNoise.offset);
+                heightMap[z * CHUNK_SIZE + x] = (int)(height + firstNoise.offset);
             }
         }
 

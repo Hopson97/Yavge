@@ -186,7 +186,7 @@ void guiResetWorld(Game* game, void (Game::*resetWorldFunc)(int), TerrainGenOpti
         nk_slider_float(ctx, 50, &terrainOptions->smoothness, 2000, 1);
 
         nk_labelf(ctx, NK_STATIC, "Roughness: %.*f", 2, terrainOptions->roughness);
-        nk_slider_float(ctx, 0.1, &terrainOptions->roughness, 2, 0.1);
+        nk_slider_float(ctx, 0.1f, &terrainOptions->roughness, 2, 0.1f);
 
         nk_labelf(ctx, NK_STATIC, "Height Offset: %.*f", 2, terrainOptions->offset);
         nk_slider_float(ctx, -100, &terrainOptions->offset, 100, 1);

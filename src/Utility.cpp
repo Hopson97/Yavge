@@ -71,9 +71,9 @@ namespace {
         static bool isFirstTimeFG = true;
         static glm::vec4 currentTextColour;
         static glm::vec4 currentBackgroundColour;
-        uint8_t r = colour.r;
-        uint8_t g = colour.g;
-        uint8_t b = colour.b;
+        uint8_t r = (uint8_t)colour.r;
+        uint8_t g = (uint8_t)colour.g;
+        uint8_t b = (uint8_t)colour.b;
         switch (mode) {
             case COL_SET_BG:
                 if (currentBackgroundColour != colour || isFirstTimeBG) {
