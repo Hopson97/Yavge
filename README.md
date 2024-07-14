@@ -6,18 +6,38 @@ This was created using OpenGL 4.5 and the direct state access (DSA) API as oppos
 
 ## Building and Running
 
-Requires conan w/ bincrafters and cmake.
+### Windows (Visual Studio)
+
+The easiest way to build is to use [vcpkg](https://vcpkg.io/en/index.html) and install libraries through this:
+
+```bash
+vcpkg install sfml
+vcpkg install glm
+vcpkg integrate install
+```
+
+Then open the Visual Studio project file, and it should build.
 
 ### Linux
+
+Requires conan.
+
+```sh
+python3 -m pip install conan==1.61.0
+```
 
 To build, at the root of the project:
 
 ```sh
-# First time only (Installs dependencies)
-sh scripts/build.sh install 
+sh scripts/build.sh install
+```
 
-# Subsequent times
-sh scripts/build.sh 
+The install argument is only needed for the first time compilation as this is what grabs the libraries from Conan.
+
+So after the first time, you can simply run:
+
+```
+sh scripts/build.sh
 ```
 
 To run, at the root of the project:

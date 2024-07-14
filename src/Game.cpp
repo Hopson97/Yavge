@@ -323,7 +323,7 @@ void Game::renderWater(const glm::mat4& projectionViewMatrix)
     m_waterNormalTexture.bind(3);
 
     glm::mat4 waterModel{1.0f};
-    waterModel = glm::translate(waterModel, {0, WATER_LEVEL + 0.1, 0});
+    waterModel = glm::translate(waterModel, {0, WATER_LEVEL + 0.0, 0});
     m_waterShader.set("modelMatrix", waterModel);
 
     m_waterQuad.getRendable().drawElements();
